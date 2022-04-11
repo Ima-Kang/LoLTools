@@ -6,6 +6,9 @@
 #include "accountinfo.h"
 #include <QLayout>
 #include <QKeyEvent>
+#include <QSet>
+
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -22,11 +25,13 @@ private slots:
     void on_actionAdd_account_triggered();
 
 private:
-    void keyPressEvent(QKeyEvent* event);
     Ui::AccountManager *ui;
     std::vector<AccountInfo> accounts;
+    QHash<int, bool> keysPressed;
     QHash<QPushButton*, QHBoxLayout*> mButtonToLayoutMap;
 
     void addToLayout(QVBoxLayout* layout, AccountInfo ai);
+    void keyReleaseEvent(QKeyEvent* event);
+    void keyPressEvent(QKeyEvent* event);
 };
 #endif // ACCOUNTMANAGER_H

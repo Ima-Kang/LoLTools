@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QDate>
 #include "accountinfo.h"
+#include <QString>
+#include <QDateEdit>
 
 namespace Ui {
 class AddDialog;
@@ -19,11 +21,10 @@ public:
 
 private:
     Ui::AddDialog *ui;
-
+    QDateEdit* dateEdit;
 private slots:
-    void nameEntry();
-    void userEntry();
-    void passwordEntry();
+    void entries();
+    void onTemp();
 };
 
 #endif // ADDDIALOG_H

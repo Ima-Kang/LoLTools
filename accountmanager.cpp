@@ -3,24 +3,27 @@
 #include "adddialog.h"
 #include <iostream>
 
-AccountManager::AccountManager(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::AccountManager)
-{
+AccountManager::AccountManager(QWidget *parent):
+        QMainWindow(parent), ui(new Ui::AccountManager){
     ui->setupUi(this);
     setFixedSize(width(), height());
-
+//    QObject::connect(
+//        ui->addWidget_button,
+//        &QPushButton::clicked,
+//        this, &MainWindow::onAddWidget
+//    );
 }
 
-AccountManager::~AccountManager()
-{
-    delete ui;
-}
+AccountManager::~AccountManager(){  delete ui;}
 
 void AccountManager::keyPressEvent(QKeyEvent* event){
-    if(event->key() == Qt::Key_T){
+    keysPressed[event->key()] = true;
+}
+
+void AccountManager::keyReleaseEvent(QKeyEvent* event){
+    if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_A])
         on_actionAdd_account_triggered();
-    }
+    keysPressed[event->key()] = false;
 }
 
 void AccountManager::addToLayout(QVBoxLayout* layout, AccountInfo ai){
@@ -54,8 +57,11 @@ void AccountManager::addToLayout(QVBoxLayout* layout, AccountInfo ai){
         qobject_cast<QWidget*>(ui->all_scroll_layout)
     );
     newLayout->addWidget(passwordButton);
+    QString statusMessage = ai.getStatus() == "Temp" ?
+        ai.getStatus() + ": " + ai.getDate().toString() :
+    ai.getStatus();
     QPushButton* statusButton = new QPushButton(
-        QString{"-"},
+        statusMessage,
         qobject_cast<QWidget*>(ui->all_scroll_layout)
     );
     newLayout->addWidget(statusButton);
@@ -69,7 +75,19 @@ void AccountManager::on_actionAdd_account_triggered()
 {
     AddDialog addDialog;
     addDialog.setModal(true);
-    addDialog.exec();
+    if(addDialog.exec() == QDialog::DialogCode::Rejected)
+        return;
+    if(addDialog.getUser() == "-" || addDialog.getPassword() == "-"){
+        auto msgErr = new QMessageBox{
+            QMessageBox::Warning,
+            QString{""},
+            QString{"Username and password required"},
+            QMessageBox::NoButton
+        };
+        msgErr->exec();
+        return;
+    }
+
     accounts.push_back((AccountInfo)addDialog);
 
     addToLayout(ui->all_scroll_layout, (AccountInfo)addDialog);

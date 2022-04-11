@@ -6,23 +6,28 @@ AddDialog::AddDialog(QWidget *parent) :
     ui(new Ui::AddDialog)
 {
     ui->setupUi(this);
-    connect(ui->ign, SIGNAL(editingFinished()), this, SLOT(nameEntry()));
-    connect(ui->usr, SIGNAL(editingFinished()), this, SLOT(userEntry()));
-    connect(ui->pwd, SIGNAL(editingFinished()), this, SLOT(passwordEntry()));
+    connect(this, SIGNAL(accepted()), this, SLOT(entries()));
+    connect(ui->sts, SIGNAL(activated(int)), this, SLOT(onTemp()));
+    dateEdit = new QDateEdit();
+    ui->date->addWidget(dateEdit);
+    dateEdit->hide();
 }
 
-AddDialog::~AddDialog()
-{
+AddDialog::~AddDialog(){
     delete ui;
 }
+void AddDialog::onTemp(){
+    if(ui->sts->currentText() == "Temp")
+        dateEdit->show();
+    else
+        dateEdit->hide();
 
-void AddDialog::nameEntry(){
-    setInGameName(ui->ign->text());
 }
-void AddDialog::userEntry(){
-    setUser(ui->usr->text());
+void AddDialog::entries(){
+    setInGameName(ui->ign->text() != "" ? ui->ign->text() : "-");
+    setUser(ui->usr->text() != "" ? ui->ign->text() : "-");
+    setPassword(ui->pwd->text() != "" ? ui->ign->text() : "-");
+    if(ui->sts->currentText() == "Temp")
+        setDate(dateEdit->date());
+    setStatus(ui->sts->currentText());
 }
-void AddDialog::passwordEntry(){
-    setPassword(ui->pwd->text());
-}
-
