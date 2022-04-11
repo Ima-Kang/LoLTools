@@ -1,6 +1,7 @@
 #include "accountmanager.h"
 #include "ui_accountmanager.h"
-
+#include "adddialog.h"
+#include <iostream>
 AccountManager::AccountManager(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AccountManager)
@@ -12,5 +13,14 @@ AccountManager::AccountManager(QWidget *parent)
 AccountManager::~AccountManager()
 {
     delete ui;
+}
+
+
+void AccountManager::on_actionAdd_account_triggered()
+{
+    AddDialog addDialog;
+    addDialog.setModal(true);
+    addDialog.exec();
+    std::cout << addDialog.getInGameName().toStdString() << std::endl;
 }
 

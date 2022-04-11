@@ -9,14 +9,19 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    accountinfo.cpp \
+    adddialog.cpp \
     main.cpp \
     accountmanager.cpp
 
 HEADERS += \
-    accountmanager.h
+    accountinfo.h \
+    accountmanager.h \
+    adddialog.h
 
 FORMS += \
-    accountmanager.ui
+    accountmanager.ui \
+    adddialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

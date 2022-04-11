@@ -2,6 +2,7 @@
 #define ACCOUNTMANAGER_H
 
 #include <QMainWindow>
+#include "accountinfo.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -14,6 +15,10 @@ class AccountManager : public QMainWindow
 public:
     AccountManager(QWidget *parent = nullptr);
     ~AccountManager();
+    std::vector<AccountInfo> accounts;
+
+private slots:
+    void on_actionAdd_account_triggered();
 
 private:
     Ui::AccountManager *ui;
