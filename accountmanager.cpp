@@ -120,6 +120,13 @@ void AccountManager::on_actionAdd_account_triggered()
 
 void AccountManager::remove_from_layouts(QString usr){
     QHBoxLayout* selectedLayout = mUserToLayoutMap.take(usr);
+
+    for(auto list = accLayouts.begin(); list != accLayouts.end(); ++list){
+        auto idx = (*list).indexOf(selectedLayout);
+        if(idx != -1)
+            (*list).remove(idx);
+    }
+
     if(selectedLayout != nullptr){
         while(selectedLayout->count() != 0){
             QLayoutItem* item = selectedLayout->takeAt(0);
