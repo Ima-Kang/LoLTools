@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     accountinfo.cpp \
     adddialog.cpp \
+    editdialog.cpp \
     main.cpp \
     accountmanager.cpp \
     removedialog.cpp
@@ -19,11 +20,13 @@ HEADERS += \
     accountinfo.h \
     accountmanager.h \
     adddialog.h \
+    editdialog.h \
     removedialog.h
 
 FORMS += \
     accountmanager.ui \
     adddialog.ui \
+    editdialog.ui \
     removedialog.ui
 
 # Default rules for deployment.

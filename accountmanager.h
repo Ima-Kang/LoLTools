@@ -1,13 +1,18 @@
 #ifndef ACCOUNTMANAGER_H
 #define ACCOUNTMANAGER_H
 
+#include "accountinfo.h"
+#include "editdialog.h"
+#include "ui_accountmanager.h"
+#include "adddialog.h"
+#include "removedialog.h"
+
 #include <QMainWindow>
 #include <QPushButton>
-#include "accountinfo.h"
 #include <QLayout>
 #include <QKeyEvent>
 #include <QSet>
-
+#include <QAbstractItemView>
 #include <QMessageBox>
 
 QT_BEGIN_NAMESPACE

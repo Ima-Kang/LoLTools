@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RemoveDialog</class>
- <widget class="QDialog" name="RemoveDialog">
+ <class>EditDialog</class>
+ <widget class="QDialog" name="EditDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>101</height>
+    <height>257</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,17 +31,71 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QLineEdit" name="ign">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>16</pointsize>
+      </font>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+     <property name="placeholderText">
+      <string>In game name</string>
      </property>
-    </spacer>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="usr">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>Username</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="pwd">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="placeholderText">
+      <string>Password</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="sts">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <item>
+      <property name="text">
+       <string>Available</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Perma</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Temp</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="date"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -60,7 +114,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>RemoveDialog</receiver>
+   <receiver>EditDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -76,7 +130,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>RemoveDialog</receiver>
+   <receiver>EditDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

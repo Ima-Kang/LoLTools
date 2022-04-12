@@ -1,8 +1,5 @@
-#include "accountmanager.h"
-#include "ui_accountmanager.h"
-#include "adddialog.h"
-#include "removedialog.h"
 #include <iostream>
+#include "accountmanager.h"
 
 AccountManager::AccountManager(QWidget *parent):
         QMainWindow(parent), ui(new Ui::AccountManager){
@@ -160,7 +157,11 @@ void AccountManager::on_actionRemove_account_triggered(){
 }
 
 void AccountManager::on_actionEdit_account_triggered(){
-
+    EditDialog editDialog{nullptr, &(accounts)};
+    editDialog.setModal(true);
+    if(editDialog.exec() == QDialog::DialogCode::Rejected)
+        return;
+    remove_from_layouts(editDialog.getUser());
 }
 
 void AccountManager::on_actionSort_All_Ctrl_S_triggered(){

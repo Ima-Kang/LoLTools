@@ -13,6 +13,7 @@ RemoveDialog::RemoveDialog(QWidget *parent, QVector<AccountInfo>* __accounts) :
     ui->accountBox->setFont(QFont{"Arial", 12});
     connect(ui->accountBox, SIGNAL(activated(int)), this, SLOT(selected()));
     connect(this, SIGNAL(accepted()), this, SLOT(selected()));
+    ui->accountBox->view()->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 }
 RemoveDialog::~RemoveDialog()
 {

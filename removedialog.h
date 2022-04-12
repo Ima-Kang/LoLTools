@@ -4,7 +4,8 @@
 #include <QDialog>
 #include <QVector>
 #include "accountinfo.h"
-
+#include <QAbstractItemView>
+#include <QScrollBar>
 namespace Ui {
 class RemoveDialog;
 }
