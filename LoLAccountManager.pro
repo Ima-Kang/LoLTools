@@ -12,16 +12,19 @@ SOURCES += \
     accountinfo.cpp \
     adddialog.cpp \
     main.cpp \
-    accountmanager.cpp
+    accountmanager.cpp \
+    removedialog.cpp
 
 HEADERS += \
     accountinfo.h \
     accountmanager.h \
-    adddialog.h
+    adddialog.h \
+    removedialog.h
 
 FORMS += \
     accountmanager.ui \
-    adddialog.ui
+    adddialog.ui \
+    removedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

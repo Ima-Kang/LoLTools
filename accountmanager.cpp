@@ -1,6 +1,7 @@
 #include "accountmanager.h"
 #include "ui_accountmanager.h"
 #include "adddialog.h"
+#include "removedialog.h"
 #include <iostream>
 
 AccountManager::AccountManager(QWidget *parent):
@@ -12,6 +13,11 @@ AccountManager::AccountManager(QWidget *parent):
 //        &QPushButton::clicked,
 //        this, &MainWindow::onAddWidget
 //    );
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
+    accLayouts.insert(QString{"All"}, QList<QHBoxLayout*>{});
+    accLayouts.insert(QString{"Available"}, QList<QHBoxLayout*>{});
+    accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
+    accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
 }
 
 AccountManager::~AccountManager(){  delete ui;}
@@ -23,52 +29,48 @@ void AccountManager::keyPressEvent(QKeyEvent* event){
 void AccountManager::keyReleaseEvent(QKeyEvent* event){
     if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_A])
         on_actionAdd_account_triggered();
+    else if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_R])
+        on_actionRemove_account_triggered();
     keysPressed[event->key()] = false;
 }
 
-void AccountManager::addToLayout(QVBoxLayout* layout, AccountInfo ai){
-    QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(
-        layout->layout()
-    );
-    QHBoxLayout* newLayout = new QHBoxLayout(
-        qobject_cast<QWidget*>(ui->all_scroll_layout)
-    );
-    newLayout->setSpacing(5);
-
-    QLabel* number = new QLabel{
-        tr("#%1").arg(layout->count()),
-        qobject_cast<QWidget*>(ui->all_scroll_layout)
-    };
-    number->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    number->setMinimumWidth(25);
-    newLayout->addWidget(number);
-    QPushButton* nameButton = new QPushButton(
-        ai.getInGameName(),
-        qobject_cast<QWidget*>(ui->all_scroll_layout)
-    );
-    newLayout->addWidget(nameButton);
-    QPushButton* userButton = new QPushButton(
-        ai.getUser(),
-        qobject_cast<QWidget*>(ui->all_scroll_layout)
-    );
-    newLayout->addWidget(userButton);
-    QPushButton* passwordButton = new QPushButton(
-        ai.getPassword(),
-        qobject_cast<QWidget*>(ui->all_scroll_layout)
-    );
-    newLayout->addWidget(passwordButton);
-    QString statusMessage = ai.getStatus() == "Temp" ?
-        ai.getStatus() + ": " + ai.getDate().toString() :
-    ai.getStatus();
-    QPushButton* statusButton = new QPushButton(
-        statusMessage,
-        qobject_cast<QWidget*>(ui->all_scroll_layout)
-    );
-    newLayout->addWidget(statusButton);
-
+void AccountManager::addToLayout(QVBoxLayout* layout, QHBoxLayout* newLayout){
+    QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(layout->layout());
     rootLayout->insertLayout(0, newLayout);
+}
 
-    //mButtonToLayoutMap.insert(button, newLayout);
+QVBoxLayout* AccountManager::getCurrentLayout(){
+    auto index = ui->tabWidget->currentIndex();
+    QVBoxLayout* tab = ui->all_scroll_layout;
+    if(index == 0){
+        tab = ui->all_scroll_layout;
+    } else if(index == 1){
+        tab = ui->available_scroll_layout;
+    } else if(index == 2){
+        tab = ui->temp_scroll_layout;
+    } else if(index == 3){
+        tab = ui->perma_scroll_layout;
+    }
+    return tab;
+}
+
+void AccountManager::populateLayout(){
+    auto index = ui->tabWidget->currentIndex();
+    QString tabName;
+    QVBoxLayout* tab = getCurrentLayout();
+    if(index == 0){
+        tabName = "All";
+    } else if(index == 1){
+        tabName = "Available";
+    } else if(index == 2){
+        tabName = "Temp";
+    } else if(index == 3){
+        tabName = "Perma";
+    }
+    for(auto hbl : accLayouts[tabName]){
+        hbl->setParent(nullptr);
+        addToLayout(tab, hbl);
+    }
 }
 
 void AccountManager::on_actionAdd_account_triggered()
@@ -87,12 +89,52 @@ void AccountManager::on_actionAdd_account_triggered()
         msgErr->exec();
         return;
     }
+    auto acc = (AccountInfo)addDialog;
+    accounts.push_back(acc);
 
-    accounts.push_back((AccountInfo)addDialog);
+    QHBoxLayout* newLayout = new QHBoxLayout();
+    QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
+    number->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    number->setMinimumWidth(25);
+    newLayout->addWidget(number);
+    QPushButton* nameButton = new QPushButton(acc.getInGameName());
+    newLayout->addWidget(nameButton);
+    QPushButton* userButton = new QPushButton(acc.getUser());
+    newLayout->addWidget(userButton);
+    QPushButton* passwordButton = new QPushButton(acc.getPassword());
+    newLayout->addWidget(passwordButton);
+    QString statusMessage = acc.getStatus() == "Temp" ?
+        acc.getStatus() + ": " + acc.getDate().toString() :
+    acc.getStatus();
+    QPushButton* statusButton = new QPushButton(statusMessage);
+    newLayout->addWidget(statusButton);
+    newLayout->setSpacing(5);
 
-    addToLayout(ui->all_scroll_layout, (AccountInfo)addDialog);
-    addToLayout(ui->available_scroll_layout, (AccountInfo)addDialog);
-    addToLayout(ui->temp_scroll_layout, (AccountInfo)addDialog);
-    addToLayout(ui->perma_scroll_layout, (AccountInfo)addDialog);
+    mUserToLayoutMap.insert(acc.getUser(), newLayout);
+    accLayouts[QString{"All"}].push_back(newLayout);
+    accLayouts[acc.getStatus()].push_back(newLayout);
+
+    QVBoxLayout* tab = getCurrentLayout();
+    addToLayout(tab, newLayout);
+}
+
+void AccountManager::remove_from_layouts(QString usr){
+    QHBoxLayout* selectedLayout = mUserToLayoutMap.take(usr);
+    if(selectedLayout != nullptr){
+        while(selectedLayout->count() != 0){
+            QLayoutItem* item = selectedLayout->takeAt(0);
+            delete item->widget();
+            delete item;
+        }
+    }
+    delete selectedLayout;
+};
+
+void AccountManager::on_actionRemove_account_triggered(){
+    RemoveDialog removeDialog{nullptr, &accounts};
+    removeDialog.setModal(true);
+    if(removeDialog.exec() == QDialog::DialogCode::Rejected)
+        return;
+    remove_from_layouts(removeDialog.getUser());
 }
 

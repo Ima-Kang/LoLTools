@@ -23,15 +23,22 @@ public:
     ~AccountManager();
 private slots:
     void on_actionAdd_account_triggered();
-
+    void on_actionRemove_account_triggered();
+    void populateLayout();
 private:
     Ui::AccountManager *ui;
-    std::vector<AccountInfo> accounts;
-    QHash<int, bool> keysPressed;
-    QHash<QPushButton*, QHBoxLayout*> mButtonToLayoutMap;
+    QVector<AccountInfo> accounts;
 
-    void addToLayout(QVBoxLayout* layout, AccountInfo ai);
+    QHash<int, bool> keysPressed;
+    QHash<QString, QHBoxLayout*> mUserToLayoutMap;
+    QHash<QString, QList<QHBoxLayout*>> accLayouts;
+
+    QVBoxLayout* getCurrentLayout();
+    void addToLayout(QVBoxLayout* layout, QHBoxLayout* accLayout);
     void keyReleaseEvent(QKeyEvent* event);
     void keyPressEvent(QKeyEvent* event);
+    void remove_from_layouts(QString usr);
+    void clearLayout();
+
 };
 #endif // ACCOUNTMANAGER_H
