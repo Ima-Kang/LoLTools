@@ -1,6 +1,6 @@
 #include "adddialog.h"
 #include "ui_adddialog.h"
-
+#include <iostream>
 AddDialog::AddDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddDialog)
@@ -25,8 +25,8 @@ void AddDialog::onTemp(){
 }
 void AddDialog::entries(){
     setInGameName(ui->ign->text() != "" ? ui->ign->text() : "-");
-    setUser(ui->usr->text() != "" ? ui->ign->text() : "-");
-    setPassword(ui->pwd->text() != "" ? ui->ign->text() : "-");
+    setUser(ui->usr->text() != "" ? ui->usr->text() : "-");
+    setPassword(ui->pwd->text() != "" ? ui->pwd->text() : "-");
     if(ui->sts->currentText() == "Temp")
         setDate(dateEdit->date());
     setStatus(ui->sts->currentText());

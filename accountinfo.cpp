@@ -16,3 +16,9 @@ void AccountInfo::setUser(QString __usr){usr = __usr;}
 void AccountInfo::setPassword(QString __pwd){pwd = __pwd;}
 void AccountInfo::setStatus(QString __sts){sts = __sts;}
 void AccountInfo::setDate(QDate __date){date = __date;}
+//bool operator==(const AccountInfo& lhs, const AccountInfo& rhs){
+//    return lhs.usr == rhs.usr;
+//}
+bool operator==(const AccountInfo& lhs, const QString& rhs){
+    return lhs.usr == rhs;
+}

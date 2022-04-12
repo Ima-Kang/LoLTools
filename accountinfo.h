@@ -21,6 +21,8 @@ public:
     void setPassword(QString pwd);
     void setStatus(QString sts);
     void setDate(QDate date);
+//    friend bool operator==(const AccountInfo& lhs, const AccountInfo& rhs);
+    friend bool operator==(const AccountInfo& lhs, const QString& rhs);
 };
 
 #endif // ACCOUNTINFO_H

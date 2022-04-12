@@ -25,6 +25,10 @@ private slots:
     void on_actionAdd_account_triggered();
     void on_actionRemove_account_triggered();
     void populateLayout();
+    void on_actionSort_All_Ctrl_S_triggered();
+
+    void on_actionEdit_account_triggered();
+
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;

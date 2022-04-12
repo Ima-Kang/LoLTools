@@ -27,10 +27,16 @@ void AccountManager::keyPressEvent(QKeyEvent* event){
 }
 
 void AccountManager::keyReleaseEvent(QKeyEvent* event){
-    if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_A])
+    if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_A]){
+        keysPressed[Qt::Key_Control] = false;
+        keysPressed[Qt::Key_A] = false;
         on_actionAdd_account_triggered();
-    else if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_R])
+    }
+    else if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_R]){
+        keysPressed[Qt::Key_Control] = false;
+        keysPressed[Qt::Key_R] = false;
         on_actionRemove_account_triggered();
+    }
     keysPressed[event->key()] = false;
 }
 
@@ -73,22 +79,29 @@ void AccountManager::populateLayout(){
     }
 }
 
-void AccountManager::on_actionAdd_account_triggered()
-{
+void AccountManager::on_actionAdd_account_triggered(){
     AddDialog addDialog;
+
     addDialog.setModal(true);
     if(addDialog.exec() == QDialog::DialogCode::Rejected)
         return;
+    auto msgErr = new QMessageBox{
+        QMessageBox::Warning,
+        QString{""},
+        QString{""},
+        QMessageBox::NoButton
+    };
     if(addDialog.getUser() == "-" || addDialog.getPassword() == "-"){
-        auto msgErr = new QMessageBox{
-            QMessageBox::Warning,
-            QString{""},
-            QString{"Username and password required"},
-            QMessageBox::NoButton
-        };
+        msgErr->setText("Username and password required");
         msgErr->exec();
         return;
     }
+    if(accounts.contains(addDialog.getUser())){
+        msgErr->setText("Account already exists in table");
+        msgErr->exec();
+        return;
+    }
+
     auto acc = (AccountInfo)addDialog;
     accounts.push_back(acc);
 
@@ -120,6 +133,7 @@ void AccountManager::on_actionAdd_account_triggered()
 
 void AccountManager::remove_from_layouts(QString usr){
     QHBoxLayout* selectedLayout = mUserToLayoutMap.take(usr);
+    accounts.remove(accounts.indexOf(usr));
 
     for(auto list = accLayouts.begin(); list != accLayouts.end(); ++list){
         auto idx = (*list).indexOf(selectedLayout);
@@ -138,10 +152,21 @@ void AccountManager::remove_from_layouts(QString usr){
 };
 
 void AccountManager::on_actionRemove_account_triggered(){
-    RemoveDialog removeDialog{nullptr, &accounts};
+    RemoveDialog removeDialog{nullptr, &(accounts)};
     removeDialog.setModal(true);
     if(removeDialog.exec() == QDialog::DialogCode::Rejected)
         return;
     remove_from_layouts(removeDialog.getUser());
 }
+
+void AccountManager::on_actionEdit_account_triggered(){
+
+}
+
+void AccountManager::on_actionSort_All_Ctrl_S_triggered(){
+
+}
+
+
+
 
