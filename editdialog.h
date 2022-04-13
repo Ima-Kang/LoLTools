@@ -18,12 +18,12 @@ class EditDialog : public QDialog, public AccountInfo
 public:
     explicit EditDialog(QWidget *parent = nullptr, QVector<AccountInfo>* __accounts = nullptr);
     ~EditDialog();
-    QString getUser();
+    QString getSelectedUser();
 private:
     Ui::EditDialog *ui;
     QDateEdit* dateEdit;
     QVector<AccountInfo>& accounts;
-    QString usr;
+    QString selectedUsr;
 
 private slots:
     void entries();

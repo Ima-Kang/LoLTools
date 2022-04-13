@@ -14,6 +14,9 @@
 #include <QSet>
 #include <QAbstractItemView>
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+#include <QDir>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -43,11 +46,14 @@ private:
     QHash<QString, QList<QHBoxLayout*>> accLayouts;
 
     QVBoxLayout* getCurrentLayout();
+    void generateAccountLayout(AccountInfo& acc);
     void addToLayout(QVBoxLayout* layout, QHBoxLayout* accLayout);
-    void keyReleaseEvent(QKeyEvent* event);
-    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
     void remove_from_layouts(QString usr);
     void clearLayout();
+    void closeEvent(QCloseEvent *bar) override;
+    void loadAccounts();
 
 };
 #endif // ACCOUNTMANAGER_H

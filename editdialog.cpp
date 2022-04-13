@@ -31,11 +31,24 @@ void EditDialog::onTemp(){
         dateEdit->hide();
 
 }
-QString EditDialog::getUser(){
-    return usr;
+
+QString EditDialog::getSelectedUser(){
+    return selectedUsr;
 }
+
 void EditDialog::selected(){
-    usr = ui->accountBox->currentText();
+    selectedUsr = ui->accountBox->currentText();
+    auto acc = accounts.at(accounts.indexOf(selectedUsr));
+    ui->ign->setText(acc.getInGameName());
+    ui->usr->setText(acc.getUser());
+    ui->pwd->setText(acc.getPassword());
+    if(acc.getStatus() == "Available")
+        ui->sts->setCurrentIndex(0);
+    else if(acc.getStatus() == "Temp")
+        ui->sts->setCurrentIndex(1);
+    else if(acc.getStatus() == "Perma")
+        ui->sts->setCurrentIndex(2);
+
 }
 void EditDialog::entries(){
     setInGameName(ui->ign->text() != "" ? ui->ign->text() : "-");

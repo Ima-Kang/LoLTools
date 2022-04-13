@@ -68,12 +68,12 @@
      </item>
      <item>
       <property name="text">
-       <string>Perma</string>
+       <string>Temp</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Temp</string>
+       <string>Perma</string>
       </property>
      </item>
     </widget>

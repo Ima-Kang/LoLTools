@@ -15,9 +15,44 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Available"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
+    loadAccounts();
 }
 
 AccountManager::~AccountManager(){  delete ui;}
+
+void AccountManager::loadAccounts(){
+    QFile file(QDir::currentPath().append(".accounts"));
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+        return;
+    QTextStream in(&file);
+    while(!in.atEnd()){
+        AccountInfo acc;
+        in >> acc;
+        if(acc.getInGameName().isEmpty())
+            break;
+        accounts.push_back(acc);
+        generateAccountLayout(acc);
+    }
+    file.close();
+}
+
+void AccountManager::closeEvent(QCloseEvent *bar){
+    QFile file(QDir::currentPath().append(".accounts"));
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(
+            this,
+            "Warning", "Cannot save file: " + file.errorString()
+        );
+        return;
+    }
+    QTextStream out(&file);
+    for(auto& acc : accounts){
+        out << acc;
+    }
+
+    file.close();
+    bar->accept();
+}
 
 void AccountManager::keyPressEvent(QKeyEvent* event){
     keysPressed[event->key()] = true;
@@ -28,11 +63,14 @@ void AccountManager::keyReleaseEvent(QKeyEvent* event){
         keysPressed[Qt::Key_Control] = false;
         keysPressed[Qt::Key_A] = false;
         on_actionAdd_account_triggered();
-    }
-    else if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_R]){
+    } else if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_R]){
         keysPressed[Qt::Key_Control] = false;
         keysPressed[Qt::Key_R] = false;
         on_actionRemove_account_triggered();
+    } else if(keysPressed[Qt::Key_Control] && keysPressed[Qt::Key_E]){
+        keysPressed[Qt::Key_Control] = false;
+        keysPressed[Qt::Key_E] = false;
+        on_actionEdit_account_triggered();
     }
     keysPressed[event->key()] = false;
 }
@@ -76,6 +114,33 @@ void AccountManager::populateLayout(){
     }
 }
 
+void AccountManager::generateAccountLayout(AccountInfo& acc){
+    QHBoxLayout* newLayout = new QHBoxLayout();
+    QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
+    number->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    number->setMinimumWidth(25);
+    newLayout->addWidget(number);
+    QPushButton* nameButton = new QPushButton(acc.getInGameName());
+    newLayout->addWidget(nameButton);
+    QPushButton* userButton = new QPushButton(acc.getUser());
+    newLayout->addWidget(userButton);
+    QPushButton* passwordButton = new QPushButton(acc.getPassword());
+    newLayout->addWidget(passwordButton);
+    QString statusMessage = acc.getStatus() == "Temp" ?
+        acc.getStatus() + ": " + acc.getDate().toString() :
+    acc.getStatus();
+    QPushButton* statusButton = new QPushButton(statusMessage);
+    newLayout->addWidget(statusButton);
+    newLayout->setSpacing(5);
+
+    mUserToLayoutMap.insert(acc.getUser(), newLayout);
+    accLayouts[QString{"All"}].push_back(newLayout);
+    accLayouts[acc.getStatus()].push_back(newLayout);
+
+    QVBoxLayout* tab = getCurrentLayout();
+    addToLayout(tab, newLayout);
+}
+
 void AccountManager::on_actionAdd_account_triggered(){
     AddDialog addDialog;
 
@@ -101,31 +166,7 @@ void AccountManager::on_actionAdd_account_triggered(){
 
     auto acc = (AccountInfo)addDialog;
     accounts.push_back(acc);
-
-    QHBoxLayout* newLayout = new QHBoxLayout();
-    QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
-    number->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    number->setMinimumWidth(25);
-    newLayout->addWidget(number);
-    QPushButton* nameButton = new QPushButton(acc.getInGameName());
-    newLayout->addWidget(nameButton);
-    QPushButton* userButton = new QPushButton(acc.getUser());
-    newLayout->addWidget(userButton);
-    QPushButton* passwordButton = new QPushButton(acc.getPassword());
-    newLayout->addWidget(passwordButton);
-    QString statusMessage = acc.getStatus() == "Temp" ?
-        acc.getStatus() + ": " + acc.getDate().toString() :
-    acc.getStatus();
-    QPushButton* statusButton = new QPushButton(statusMessage);
-    newLayout->addWidget(statusButton);
-    newLayout->setSpacing(5);
-
-    mUserToLayoutMap.insert(acc.getUser(), newLayout);
-    accLayouts[QString{"All"}].push_back(newLayout);
-    accLayouts[acc.getStatus()].push_back(newLayout);
-
-    QVBoxLayout* tab = getCurrentLayout();
-    addToLayout(tab, newLayout);
+    generateAccountLayout(acc);
 }
 
 void AccountManager::remove_from_layouts(QString usr){
@@ -161,7 +202,33 @@ void AccountManager::on_actionEdit_account_triggered(){
     editDialog.setModal(true);
     if(editDialog.exec() == QDialog::DialogCode::Rejected)
         return;
-    remove_from_layouts(editDialog.getUser());
+    auto msgErr = new QMessageBox{
+        QMessageBox::Warning,
+        QString{""},
+        QString{""},
+        QMessageBox::NoButton
+    };
+    if(editDialog.getUser() == "-" || editDialog.getPassword() == "-"){
+        msgErr->setText("Username and password required");
+        msgErr->exec();
+        return;
+    }
+    QHBoxLayout* selectedLayout = mUserToLayoutMap.take(editDialog.getSelectedUser());
+    mUserToLayoutMap[editDialog.getUser()] = selectedLayout;
+    AccountInfo ai = (AccountInfo)editDialog;
+    qobject_cast<QPushButton*>(selectedLayout->itemAt(1)->widget())->
+        setText(editDialog.getInGameName());
+    qobject_cast<QPushButton*>(selectedLayout->itemAt(2)->widget())->
+        setText(editDialog.getUser());
+    qobject_cast<QPushButton*>(selectedLayout->itemAt(3)->widget())->
+        setText(editDialog.getPassword());
+    QString statusMessage = ai.getStatus() == "Temp" ?
+        ai.getStatus() + ": " + ai.getDate().toString() :
+    ai.getStatus();
+    qobject_cast<QPushButton*>(selectedLayout->itemAt(4)->widget())->
+        setText(statusMessage);
+    accounts.replace(accounts.indexOf(editDialog.getSelectedUser()), ai);
+
 }
 
 void AccountManager::on_actionSort_All_Ctrl_S_triggered(){

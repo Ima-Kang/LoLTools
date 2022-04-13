@@ -22,11 +22,20 @@
        <height>0</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="maxVisibleItems">
       <number>10</number>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
+     </property>
+     <property name="placeholderText">
+      <string>Username</string>
      </property>
     </widget>
    </item>
@@ -84,12 +93,12 @@
      </item>
      <item>
       <property name="text">
-       <string>Perma</string>
+       <string>Temp</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Temp</string>
+       <string>Perma</string>
       </property>
      </item>
     </widget>
