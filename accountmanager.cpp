@@ -5,18 +5,12 @@ AccountManager::AccountManager(QWidget *parent):
         QMainWindow(parent), ui(new Ui::AccountManager){
     ui->setupUi(this);
     setFixedSize(width(), height());
-//    QObject::connect(
-//        ui->addWidget_button,
-//        &QPushButton::clicked,
-//        this, &MainWindow::onAddWidget
-//    );
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
     accLayouts.insert(QString{"All"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Available"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
     loadAccounts();
-    //QDate::currentDate();
 }
 
 AccountManager::~AccountManager(){  delete ui;}
@@ -31,6 +25,7 @@ void AccountManager::loadAccounts(){
         in >> acc;
         if(acc.getInGameName().isEmpty())
             break;
+
         accounts.push_back(acc);
         generateAccountLayout(acc);
     }

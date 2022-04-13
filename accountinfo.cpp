@@ -35,14 +35,14 @@ QTextStream& operator>>(QTextStream& in, AccountInfo& acc){
     QString mo, day, yr;
     if(in.atEnd())
         return in;
-    in >> acc.ign;
-    in >> acc.usr;
-    in >> acc.pwd;
-    in >> acc.sts;
+    acc.ign = in.readLine(AccountInfo::IN_BUFFER);
+    acc.usr = in.readLine(AccountInfo::IN_BUFFER);
+    acc.pwd = in.readLine(AccountInfo::IN_BUFFER);
+    acc.sts = in.readLine(AccountInfo::IN_BUFFER);
     if(acc.getStatus() == "Temp"){
-        in >> yr;
-        in >> mo;
-        in >> day;
+        yr = in.readLine(AccountInfo::IN_BUFFER);
+        mo = in.readLine(AccountInfo::IN_BUFFER);
+        day = in.readLine(AccountInfo::IN_BUFFER);
     }
     acc.setDate(QDate{yr.toInt(), mo.toInt(), day.toInt()});
     return in;

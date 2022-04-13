@@ -10,6 +10,7 @@ class AccountInfo
 private:
     QString ign, usr, pwd, sts;
     QDate date;
+    static const int IN_BUFFER {100};
 public:
     AccountInfo();
     AccountInfo(QString __ign, QString __usr, QString __pwd, QDate __date);
