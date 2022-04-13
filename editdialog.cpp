@@ -37,6 +37,9 @@ QString EditDialog::getSelectedUser(){
 
 void EditDialog::selected(){
     selectedUsr = ui->accountBox->currentText();
+    if(selectedUsr.isEmpty())
+        return;
+
     auto acc = accounts.at(accounts.indexOf(selectedUsr));
     ui->ign->setText(acc.getInGameName());
     ui->usr->setText(acc.getUser());

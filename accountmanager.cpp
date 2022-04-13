@@ -195,6 +195,8 @@ void AccountManager::on_actionRemove_account_triggered(){
     removeDialog.setModal(true);
     if(removeDialog.exec() == QDialog::DialogCode::Rejected)
         return;
+    if(removeDialog.getUser().isEmpty())
+        return;
     remove_from_layouts(removeDialog.getUser());
 }
 
@@ -203,6 +205,8 @@ void AccountManager::on_actionEdit_account_triggered(){
     editDialog.setModal(true);
     if(editDialog.exec() == QDialog::DialogCode::Rejected)
         return;
+//    if(editDialog.getSelectedUser().isEmpty())
+//        return;
     auto msgErr = new QMessageBox{
         QMessageBox::Warning,
         QString{""},
@@ -214,7 +218,7 @@ void AccountManager::on_actionEdit_account_triggered(){
         msgErr->exec();
         return;
     }
-
+    //  Removing from old container and placing it in the new container
     QHBoxLayout* selectedLayout = mUserToLayoutMap.take(editDialog.getSelectedUser());
     AccountInfo ai = (AccountInfo)editDialog;
     auto oldStatus = accounts.at(accounts.indexOf(editDialog.getSelectedUser())).getStatus();
