@@ -55,6 +55,6 @@ private:
     void closeEvent(QCloseEvent *bar) override;
     void loadAccounts();
     void onButtonCopy();
-
+    void updateRowNumber();
 };
 #endif // ACCOUNTMANAGER_H

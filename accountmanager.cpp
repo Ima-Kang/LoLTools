@@ -74,7 +74,7 @@ void AccountManager::keyReleaseEvent(QKeyEvent* event){
 
 void AccountManager::addToLayout(QVBoxLayout* layout, QHBoxLayout* newLayout){
     QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(layout->layout());
-    rootLayout->insertLayout(0, newLayout);
+    rootLayout->insertLayout(layout->count() - 1, newLayout);
 }
 
 QVBoxLayout* AccountManager::getCurrentLayout(){
@@ -96,6 +96,7 @@ void AccountManager::populateLayout(){
     auto index = ui->tabWidget->currentIndex();
     QString tabName;
     QVBoxLayout* tab = getCurrentLayout();
+    updateRowNumber();
     if(index == 0){
         tabName = "All";
     } else if(index == 1){
@@ -109,6 +110,7 @@ void AccountManager::populateLayout(){
         hbl->setParent(nullptr);
         addToLayout(tab, hbl);
     }
+    updateRowNumber();
 }
 
 void AccountManager::onButtonCopy(){
@@ -214,6 +216,28 @@ void AccountManager::on_actionRemove_account_triggered(){
         return;
     remove_from_layouts(removeDialog.getUser());
     updateDetails();
+    updateRowNumber();
+}
+
+void AccountManager::updateRowNumber(){
+    auto index = ui->tabWidget->currentIndex();
+    QString tabName;
+    if(index == 0){
+        tabName = "All";
+    } else if(index == 1){
+        tabName = "Available";
+    } else if(index == 2){
+        tabName = "Temp";
+    } else if(index == 3){
+        tabName = "Perma";
+    }
+    auto list = accLayouts[tabName];
+    for(auto& hbl : list){
+        qobject_cast<QLabel*>(hbl->itemAt(0)->widget())->
+            setText("#" + QString{std::to_string(
+            getCurrentLayout()->indexOf(hbl) + 1).c_str()}
+        );
+    }
 }
 
 void AccountManager::updateDetails(){
