@@ -29,7 +29,6 @@ void EditDialog::onTemp(){
         dateEdit->show();
     else
         dateEdit->hide();
-
 }
 
 QString EditDialog::getSelectedUser(){
@@ -44,10 +43,13 @@ void EditDialog::selected(){
     ui->pwd->setText(acc.getPassword());
     if(acc.getStatus() == "Available")
         ui->sts->setCurrentIndex(0);
-    else if(acc.getStatus() == "Temp")
+    else if(acc.getStatus() == "Temp"){
         ui->sts->setCurrentIndex(1);
+        dateEdit->show();
+    }
     else if(acc.getStatus() == "Perma")
         ui->sts->setCurrentIndex(2);
+    dateEdit->setDate(acc.getDate());
 
 }
 void EditDialog::entries(){

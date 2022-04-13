@@ -9,6 +9,7 @@ AddDialog::AddDialog(QWidget *parent) :
     connect(this, SIGNAL(accepted()), this, SLOT(entries()));
     connect(ui->sts, SIGNAL(activated(int)), this, SLOT(onTemp()));
     dateEdit = new QDateEdit();
+    dateEdit->setDate(QDate::currentDate().addDays(14));
     ui->date->addWidget(dateEdit);
     dateEdit->hide();
 }

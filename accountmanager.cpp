@@ -16,6 +16,7 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
     loadAccounts();
+    //QDate::currentDate();
 }
 
 AccountManager::~AccountManager(){  delete ui;}
@@ -213,9 +214,16 @@ void AccountManager::on_actionEdit_account_triggered(){
         msgErr->exec();
         return;
     }
+
     QHBoxLayout* selectedLayout = mUserToLayoutMap.take(editDialog.getSelectedUser());
-    mUserToLayoutMap[editDialog.getUser()] = selectedLayout;
     AccountInfo ai = (AccountInfo)editDialog;
+    auto oldStatus = accounts.at(accounts.indexOf(editDialog.getSelectedUser())).getStatus();
+
+    mUserToLayoutMap[editDialog.getUser()] = selectedLayout;
+    accLayouts[oldStatus].removeAt(accLayouts[oldStatus].indexOf(selectedLayout));
+    accLayouts[ai.getStatus()].push_back(selectedLayout);
+
+
     qobject_cast<QPushButton*>(selectedLayout->itemAt(1)->widget())->
         setText(editDialog.getInGameName());
     qobject_cast<QPushButton*>(selectedLayout->itemAt(2)->widget())->
