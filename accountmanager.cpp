@@ -115,6 +115,12 @@ void AccountManager::populateLayout(){
     }
 }
 
+void AccountManager::onButtonCopy(){
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setText(button->text());
+}
+
 void AccountManager::generateAccountLayout(AccountInfo& acc){
     QHBoxLayout* newLayout = new QHBoxLayout();
     QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
@@ -122,10 +128,22 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     number->setMinimumWidth(25);
     newLayout->addWidget(number);
     QPushButton* nameButton = new QPushButton(acc.getInGameName());
+    QObject::connect(
+        nameButton, &QPushButton::clicked,
+        this, &AccountManager::onButtonCopy
+    );
     newLayout->addWidget(nameButton);
     QPushButton* userButton = new QPushButton(acc.getUser());
+    QObject::connect(
+        userButton, &QPushButton::clicked,
+        this, &AccountManager::onButtonCopy
+    );
     newLayout->addWidget(userButton);
     QPushButton* passwordButton = new QPushButton(acc.getPassword());
+    QObject::connect(
+        passwordButton, &QPushButton::clicked,
+        this, &AccountManager::onButtonCopy
+    );
     newLayout->addWidget(passwordButton);
     QString statusMessage = acc.getStatus() == "Temp" ?
         acc.getStatus() + ": " + acc.getDate().toString() :
@@ -205,8 +223,6 @@ void AccountManager::on_actionEdit_account_triggered(){
     editDialog.setModal(true);
     if(editDialog.exec() == QDialog::DialogCode::Rejected)
         return;
-//    if(editDialog.getSelectedUser().isEmpty())
-//        return;
     auto msgErr = new QMessageBox{
         QMessageBox::Warning,
         QString{""},

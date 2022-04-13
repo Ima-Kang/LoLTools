@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
+#include <QClipboard>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -54,6 +55,7 @@ private:
     void clearLayout();
     void closeEvent(QCloseEvent *bar) override;
     void loadAccounts();
+    void onButtonCopy();
 
 };
 #endif // ACCOUNTMANAGER_H
