@@ -11,6 +11,7 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
     loadAccounts();
+    updateDetails();
 }
 
 AccountManager::~AccountManager(){  delete ui;}
@@ -181,6 +182,7 @@ void AccountManager::on_actionAdd_account_triggered(){
     auto acc = (AccountInfo)addDialog;
     accounts.push_back(acc);
     generateAccountLayout(acc);
+    updateDetails();
 }
 
 void AccountManager::remove_from_layouts(QString usr){
@@ -211,7 +213,39 @@ void AccountManager::on_actionRemove_account_triggered(){
     if(removeDialog.getUser().isEmpty())
         return;
     remove_from_layouts(removeDialog.getUser());
+    updateDetails();
 }
+
+void AccountManager::updateDetails(){
+    ui->numAccounts->setText(
+        "Number of Accounts: " +
+        QString{std::to_string(accounts.count()).c_str()}
+    );
+    ui->numAvailable->setText(
+        "Available Accounts: " + QString{
+            std::to_string(std::count_if(
+                accounts.begin(), accounts.end(),
+                [](AccountInfo a){return a.getStatus() == "Available";}
+            )).c_str()
+        }
+    );
+    ui->numTemp->setText(
+        "Temp Accounts: " + QString{
+            std::to_string(std::count_if(
+                accounts.begin(), accounts.end(),
+                [](AccountInfo a){return a.getStatus() == "Temp";}
+            )).c_str()
+        }
+    );
+    ui->numPerma->setText(
+        "Perma Accounts: " + QString{
+            std::to_string(std::count_if(
+                accounts.begin(), accounts.end(),
+                [](AccountInfo a){return a.getStatus() == "Perma";}
+            )).c_str()
+        }
+    );
+};
 
 void AccountManager::on_actionEdit_account_triggered(){
     EditDialog editDialog{nullptr, &(accounts)};
@@ -251,12 +285,9 @@ void AccountManager::on_actionEdit_account_triggered(){
     qobject_cast<QPushButton*>(selectedLayout->itemAt(4)->widget())->
         setText(statusMessage);
     accounts.replace(accounts.indexOf(editDialog.getSelectedUser()), ai);
-
+    updateDetails();
 }
 
-void AccountManager::on_actionSort_All_Ctrl_S_triggered(){
-
-}
 
 
 

@@ -13,6 +13,7 @@ EditDialog::EditDialog(QWidget *parent, QVector<AccountInfo>* __accounts) :
     connect(this, SIGNAL(accepted()), this, SLOT(entries()));
     connect(ui->sts, SIGNAL(activated(int)), this, SLOT(onTemp()));
     dateEdit = new QDateEdit();
+    dateEdit->setDate(QDate::currentDate().addDays(14));
     ui->date->addWidget(dateEdit);
     dateEdit->hide();
     connect(ui->accountBox, SIGNAL(activated(int)), this, SLOT(selected()));
@@ -59,8 +60,14 @@ void EditDialog::entries(){
     setInGameName(ui->ign->text() != "" ? ui->ign->text() : "-");
     setUser(ui->usr->text() != "" ? ui->usr->text() : "-");
     setPassword(ui->pwd->text() != "" ? ui->pwd->text() : "-");
-    if(ui->sts->currentText() == "Temp")
+    if(ui->sts->currentText() == "Temp"){
         setDate(dateEdit->date());
+        if(getDate() <= QDate::currentDate() && getDate() != QDate{}){
+            setDate(QDate{});
+            setStatus("Available");
+            return;
+        }
+    }
     setStatus(ui->sts->currentText());
 }
 

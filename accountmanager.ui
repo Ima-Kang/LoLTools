@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>744</width>
-    <height>583</height>
+    <height>575</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -133,7 +133,7 @@
              <x>0</x>
              <y>0</y>
              <width>702</width>
-             <height>448</height>
+             <height>407</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="all_scroll_layout">
@@ -260,7 +260,7 @@
              <x>0</x>
              <y>0</y>
              <width>702</width>
-             <height>448</height>
+             <height>407</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="available_scroll_layout">
@@ -387,7 +387,7 @@
              <x>0</x>
              <y>0</y>
              <width>702</width>
-             <height>448</height>
+             <height>407</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="temp_scroll_layout">
@@ -514,7 +514,7 @@
              <x>0</x>
              <y>0</y>
              <width>702</width>
-             <height>448</height>
+             <height>407</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="perma_scroll_layout">
@@ -538,6 +538,98 @@
        </layout>
       </widget>
      </widget>
+    </item>
+    <item>
+     <widget class="Line" name="line_21">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_25">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Details:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_18">
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="numAccounts">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_19">
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="numAvailable">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_17">
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="numTemp">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_20">
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="numPerma">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -563,8 +655,6 @@
     <addaction name="actionRemove_account"/>
     <addaction name="separator"/>
     <addaction name="actionEdit_account"/>
-    <addaction name="separator"/>
-    <addaction name="actionSort_All_Ctrl_S"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuOptions"/>

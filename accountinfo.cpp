@@ -45,5 +45,7 @@ QTextStream& operator>>(QTextStream& in, AccountInfo& acc){
         day = in.readLine(AccountInfo::IN_BUFFER);
     }
     acc.setDate(QDate{yr.toInt(), mo.toInt(), day.toInt()});
+    if(acc.date <= QDate::currentDate() && acc.date != QDate{})
+        acc.sts = "Available";
     return in;
 }
