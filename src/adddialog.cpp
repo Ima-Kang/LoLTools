@@ -28,7 +28,13 @@ void AddDialog::entries(){
     setInGameName(ui->ign->text() != "" ? ui->ign->text() : "-");
     setUser(ui->usr->text() != "" ? ui->usr->text() : "-");
     setPassword(ui->pwd->text() != "" ? ui->pwd->text() : "-");
-    if(ui->sts->currentText() == "Temp")
+    if(ui->sts->currentText() == "Temp"){
         setDate(dateEdit->date());
+        if(getDate() <= QDate::currentDate() && getDate() != QDate{}){
+            setDate(QDate{});
+            setStatus("Available");
+            return;
+        }
+    }
     setStatus(ui->sts->currentText());
 }

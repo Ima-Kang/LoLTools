@@ -11,25 +11,25 @@ CONFIG += c++17
 RC_ICONS = ChampionSquare.ico
 
 SOURCES += \
-    accountinfo.cpp \
-    adddialog.cpp \
-    editdialog.cpp \
-    main.cpp \
-    accountmanager.cpp \
-    removedialog.cpp
+    src/accountinfo.cpp \
+    src/adddialog.cpp \
+    src/editdialog.cpp \
+    src/main.cpp \
+    src/accountmanager.cpp \
+    src/removedialog.cpp
 
 HEADERS += \
-    accountinfo.h \
-    accountmanager.h \
-    adddialog.h \
-    editdialog.h \
-    removedialog.h
+    headers/accountinfo.h \
+    headers/accountmanager.h \
+    headers/adddialog.h \
+    headers/editdialog.h \
+    headers/removedialog.h
 
 FORMS += \
-    accountmanager.ui \
-    adddialog.ui \
-    editdialog.ui \
-    removedialog.ui
+    forms/accountmanager.ui \
+    forms/adddialog.ui \
+    forms/editdialog.ui \
+    forms/removedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -39,4 +39,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES +=
 
 RESOURCES += \
-    qss.qrc
+    res/qss.qrc
