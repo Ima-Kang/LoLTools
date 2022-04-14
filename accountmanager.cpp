@@ -72,10 +72,6 @@ void AccountManager::keyReleaseEvent(QKeyEvent* event){
     keysPressed[event->key()] = false;
 }
 
-void AccountManager::addToLayout(QVBoxLayout* layout, QHBoxLayout* newLayout){
-    QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(layout->layout());
-    rootLayout->insertLayout(layout->count() - 1, newLayout);
-}
 
 QVBoxLayout* AccountManager::getCurrentLayout(){
     auto index = ui->tabWidget->currentIndex();
@@ -119,9 +115,16 @@ void AccountManager::onButtonCopy(){
     clipboard->setText(button->text());
 }
 
+void AccountManager::addToLayout(QVBoxLayout* layout, QHBoxLayout* newLayout){
+    QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(layout->layout());
+    rootLayout->insertLayout(layout->count() - 1, newLayout);
+}
+
 void AccountManager::generateAccountLayout(AccountInfo& acc){
+    QVBoxLayout* tab = getCurrentLayout();
     QHBoxLayout* newLayout = new QHBoxLayout();
     QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
+
     number->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     number->setMinimumWidth(25);
     newLayout->addWidget(number);
@@ -130,23 +133,32 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
         nameButton, &QPushButton::clicked,
         this, &AccountManager::onButtonCopy
     );
+    nameButton->setToolTip(QString{"Copy name"});
     newLayout->addWidget(nameButton);
     QPushButton* userButton = new QPushButton(acc.getUser());
     QObject::connect(
         userButton, &QPushButton::clicked,
         this, &AccountManager::onButtonCopy
     );
+    userButton->setToolTip(QString{"Copy user"});
     newLayout->addWidget(userButton);
     QPushButton* passwordButton = new QPushButton(acc.getPassword());
     QObject::connect(
         passwordButton, &QPushButton::clicked,
         this, &AccountManager::onButtonCopy
     );
+    passwordButton->setToolTip(QString{"Copy password"});
     newLayout->addWidget(passwordButton);
     QString statusMessage = acc.getStatus() == "Temp" ?
         acc.getStatus() + ": " + acc.getDate().toString() :
     acc.getStatus();
     QPushButton* statusButton = new QPushButton(statusMessage);
+    QObject::connect(
+        statusButton, &QPushButton::clicked,
+        this, &AccountManager::onStatusChange
+    );
+    statusButton->setObjectName(QString{acc.getUser()});
+    statusButton->setToolTip(QString{"Change status"});
     newLayout->addWidget(statusButton);
     newLayout->setSpacing(5);
 
@@ -154,8 +166,35 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     accLayouts[QString{"All"}].push_back(newLayout);
     accLayouts[acc.getStatus()].push_back(newLayout);
 
-    QVBoxLayout* tab = getCurrentLayout();
     addToLayout(tab, newLayout);
+}
+
+void AccountManager::onStatusChange(){
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+//    QString user = qobject_cast<QPushButton*>(
+//        button->parent()->
+//    children().at(2))->text();
+    QString user = button->objectName();
+    QString status;
+    QDate banDate = QDate::currentDate().addDays(14);
+    if(button->text() == "Available"){
+        button->setText("Temp: " + banDate.toString());
+        status = "Temp";
+    } else if(button->text() == "Perma"){
+        button->setText("Available");
+        status = "Available";
+    } else{
+        button->setText("Perma");
+        status = "Perma";
+    }
+
+    auto oldStatus = accounts.at(accounts.indexOf(user)).getStatus();
+    auto layout = mUserToLayoutMap[user];
+    accLayouts[oldStatus].removeAt(accLayouts[oldStatus].indexOf(layout));
+    accLayouts[status].push_back(layout);
+    accounts[accounts.indexOf(user)].setStatus(status);
+    accounts[accounts.indexOf(user)].setDate(banDate);
+    updateDetails();
 }
 
 void AccountManager::on_actionAdd_account_triggered(){

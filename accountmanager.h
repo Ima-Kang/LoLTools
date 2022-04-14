@@ -56,5 +56,6 @@ private:
     void loadAccounts();
     void onButtonCopy();
     void updateRowNumber();
+    void onStatusChange();
 };
 #endif // ACCOUNTMANAGER_H
