@@ -1,4 +1,3 @@
-#include <iostream>
 #include "accountmanager.h"
 
 AccountManager::AccountManager(QWidget *parent):
@@ -6,6 +5,7 @@ AccountManager::AccountManager(QWidget *parent):
     ui->setupUi(this);
     setFixedSize(width(), height());
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
+    setWindowIcon(QIcon(":/imgs/ChampionSquare.bmp"));
     accLayouts.insert(QString{"All"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Available"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
@@ -17,7 +17,7 @@ AccountManager::AccountManager(QWidget *parent):
 AccountManager::~AccountManager(){  delete ui;}
 
 void AccountManager::loadAccounts(){
-    QFile file(QDir::currentPath().append(".accounts"));
+    QFile file(QDir::currentPath().append("/.accounts"));
     if(!file.open(QFile::ReadOnly | QFile::Text))
         return;
     QTextStream in(&file);
@@ -34,7 +34,7 @@ void AccountManager::loadAccounts(){
 }
 
 void AccountManager::closeEvent(QCloseEvent *bar){
-    QFile file(QDir::currentPath().append(".accounts"));
+    QFile file(QDir::currentPath().append("/.accounts"));
     if(!file.open(QFile::WriteOnly | QFile::Text)){
         QMessageBox::warning(
             this,

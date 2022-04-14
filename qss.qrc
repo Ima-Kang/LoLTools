@@ -2,4 +2,7 @@
     <qresource prefix="/style">
         <file>Combinear.qss</file>
     </qresource>
+    <qresource prefix="/imgs">
+        <file>ChampionSquare.bmp</file>
+    </qresource>
 </RCC>

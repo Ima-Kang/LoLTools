@@ -1,6 +1,5 @@
 #include "removedialog.h"
 #include "ui_removedialog.h"
-#include <iostream>
 
 RemoveDialog::RemoveDialog(QWidget *parent, QVector<AccountInfo>* __accounts) :
     QDialog(parent),

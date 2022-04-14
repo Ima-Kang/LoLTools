@@ -1,5 +1,5 @@
 #include "accountinfo.h"
-#include <iostream>
+
 AccountInfo::AccountInfo(){}
 AccountInfo::AccountInfo(
         QString __ign, QString __usr, QString __pwd, QDate __date):
