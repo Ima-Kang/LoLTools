@@ -18,6 +18,12 @@
 #include <QTextStream>
 #include <QDir>
 #include <QClipboard>
+#include <QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -35,8 +41,13 @@ private slots:
     void on_actionRemove_account_triggered();
     void populateLayout();
     void on_actionEdit_account_triggered();
-
 private:
+    const QString SUMMONER_BY_NAME =
+        "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/";
+    const QString LEAGUE_BY_SUMMONER =
+        "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/";
+    const QString KEY;
+
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;
 
@@ -45,6 +56,7 @@ private:
     QHash<QString, QList<QHBoxLayout*>> accLayouts;
 
     QVBoxLayout* getCurrentLayout();
+    QString getRankDetails(AccountInfo acc);
     void updateDetails();
     void generateAccountLayout(AccountInfo& acc);
     void addToLayout(QVBoxLayout* layout, QHBoxLayout* accLayout);
@@ -57,5 +69,6 @@ private:
     void onButtonCopy();
     void updateRowNumber();
     void onStatusChange();
+    void getKey();
 };
 #endif // ACCOUNTMANAGER_H

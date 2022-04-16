@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>744</width>
-    <height>575</height>
+    <width>920</width>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,6 +120,23 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="Line" name="line_22">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Rank</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -132,8 +149,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>702</width>
-             <height>407</height>
+             <width>878</width>
+             <height>498</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="all_scroll_layout">
@@ -259,8 +276,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>702</width>
-             <height>407</height>
+             <width>878</width>
+             <height>498</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="available_scroll_layout">
@@ -386,8 +403,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>702</width>
-             <height>407</height>
+             <width>878</width>
+             <height>498</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="temp_scroll_layout">
@@ -513,8 +530,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>702</width>
-             <height>407</height>
+             <width>878</width>
+             <height>498</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="perma_scroll_layout">
@@ -638,7 +655,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>744</width>
+     <width>920</width>
      <height>21</height>
     </rect>
    </property>

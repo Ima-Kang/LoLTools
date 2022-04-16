@@ -1,4 +1,4 @@
-#include "accountmanager.h"
+#include "../headers/accountmanager.h"
 
 AccountManager::AccountManager(QWidget *parent):
         QMainWindow(parent), ui(new Ui::AccountManager){
@@ -10,8 +10,18 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Available"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
     accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
+
+    getKey();
     loadAccounts();
     updateDetails();
+}
+
+void AccountManager::getKey(){
+    QFile file(QDir::currentPath().append("/.key"));
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+        return;
+    QTextStream in(&file);
+    const_cast<QString&>(KEY) = in.readAll();
 }
 
 AccountManager::~AccountManager(){  delete ui;}
@@ -166,7 +176,65 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     accLayouts[QString{"All"}].push_back(newLayout);
     accLayouts[acc.getStatus()].push_back(newLayout);
 
+    QString stringRank = "-";
+    if(acc.getInGameName() != "-"){
+        getRankDetails(acc);
+    }
+
+    QLabel* rank = new QLabel{stringRank};
+    newLayout->addWidget(rank);
     addToLayout(tab, newLayout);
+}
+
+QString AccountManager::getRankDetails(AccountInfo acc){
+    QString *stream = new QString{acc.getInGameName() + "?api_key=" + KEY};
+    auto manager = new QNetworkAccessManager();
+    QEventLoop loop;
+
+    QObject::connect(manager, &QNetworkAccessManager::finished,
+        this, [=](QNetworkReply *reply) mutable -> auto{
+            if (reply->error()) {
+                qDebug() << reply->errorString();
+                return;
+            }
+
+            QString answer = (QString)reply->readAll();
+            QJsonDocument jsonResponse = QJsonDocument::fromJson(answer.toUtf8());
+            QJsonObject jsonObject = jsonResponse.object();
+
+            *stream = jsonObject["id"].toString() + "?api_key=" + KEY;
+            reply->deleteLater();
+        }
+    );
+    connect(manager, SIGNAL(finished(QNetworkReply*)),&loop, SLOT(quit()));
+    manager->get(QNetworkRequest{QUrl{SUMMONER_BY_NAME + *stream}});
+    loop.exec();
+
+    QObject::disconnect(manager, nullptr, this, nullptr);
+    QObject::connect(manager, &QNetworkAccessManager::finished,
+        this, [=](QNetworkReply *reply) mutable -> auto{
+            if (reply->error()) {
+                qDebug() << reply->errorString();
+                return;
+            }
+
+            QString answer = (QString)reply->readAll();
+            QJsonDocument jsonResponse = QJsonDocument::fromJson(answer.toUtf8());
+            QJsonObject jsonObject = jsonResponse.array().at(0).toObject();
+
+            *stream = (jsonObject["tier"].toString() + " "
+                + jsonObject["rank"].toString() + ", "
+                + QString::number(jsonObject["leaguePoints"].toInt())
+                + " lp"
+            );
+            reply->deleteLater();
+            qDebug() << *stream;
+        }
+    );
+    manager->get(QNetworkRequest{QUrl{LEAGUE_BY_SUMMONER + *stream}});
+    loop.exec();
+
+    return *stream;
 }
 
 void AccountManager::onStatusChange(){

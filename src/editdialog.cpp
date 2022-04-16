@@ -1,4 +1,4 @@
-#include "editdialog.h"
+#include "../headers/editdialog.h"
 #include "ui_editdialog.h"
 
 EditDialog::EditDialog(QWidget *parent, QVector<AccountInfo>* __accounts) :

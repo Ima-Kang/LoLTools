@@ -1,4 +1,4 @@
-#include "accountinfo.h"
+#include "../headers/accountinfo.h"
 
 AccountInfo::AccountInfo(){}
 AccountInfo::AccountInfo(
