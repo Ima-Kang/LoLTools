@@ -12,6 +12,7 @@ AddDialog::AddDialog(QWidget *parent) :
     dateEdit->setDate(QDate::currentDate().addDays(14));
     ui->date->addWidget(dateEdit);
     dateEdit->hide();
+    setRank("UNRANKED");
 }
 
 AddDialog::~AddDialog(){

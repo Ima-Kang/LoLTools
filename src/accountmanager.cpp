@@ -37,8 +37,8 @@ void AccountManager::loadAccounts(){
         if(acc.getInGameName().isEmpty())
             break;
 
-        accounts.push_back(acc);
         generateAccountLayout(acc);
+        accounts.push_back(acc);
     }
     file.close();
 }
@@ -176,12 +176,11 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     accLayouts[QString{"All"}].push_back(newLayout);
     accLayouts[acc.getStatus()].push_back(newLayout);
 
-    QString stringRank = "-";
     if(acc.getInGameName() != "-"){
-        getRankDetails(acc);
+        acc.setRank(getRankDetails(acc));
     }
 
-    QLabel* rank = new QLabel{stringRank};
+    QLabel* rank = new QLabel{acc.getRank()};
     newLayout->addWidget(rank);
     addToLayout(tab, newLayout);
 }
@@ -195,6 +194,7 @@ QString AccountManager::getRankDetails(AccountInfo acc){
         this, [=](QNetworkReply *reply) mutable -> auto{
             if (reply->error()) {
                 qDebug() << reply->errorString();
+                *stream = acc.getRank();
                 return;
             }
 
@@ -215,6 +215,7 @@ QString AccountManager::getRankDetails(AccountInfo acc){
         this, [=](QNetworkReply *reply) mutable -> auto{
             if (reply->error()) {
                 qDebug() << reply->errorString();
+                *stream = acc.getRank();
                 return;
             }
 
@@ -222,13 +223,16 @@ QString AccountManager::getRankDetails(AccountInfo acc){
             QJsonDocument jsonResponse = QJsonDocument::fromJson(answer.toUtf8());
             QJsonObject jsonObject = jsonResponse.array().at(0).toObject();
 
-            *stream = (jsonObject["tier"].toString() + " "
-                + jsonObject["rank"].toString() + ", "
-                + QString::number(jsonObject["leaguePoints"].toInt())
-                + " lp"
-            );
+            if(!jsonObject["tier"].toString().isEmpty()){
+                *stream = (jsonObject["tier"].toString() + " "
+                    + jsonObject["rank"].toString() + ", "
+                    + QString::number(jsonObject["leaguePoints"].toInt())
+                    + " lp"
+                );
+            } else{
+                *stream = "UNRANKED";
+            }
             reply->deleteLater();
-            qDebug() << *stream;
         }
     );
     manager->get(QNetworkRequest{QUrl{LEAGUE_BY_SUMMONER + *stream}});

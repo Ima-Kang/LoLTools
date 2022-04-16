@@ -2,13 +2,15 @@
 
 AccountInfo::AccountInfo(){}
 AccountInfo::AccountInfo(
-        QString __ign, QString __usr, QString __pwd, QDate __date):
-    ign{__ign}, usr{__usr}, pwd{__pwd}, date{__date} {
+    QString __ign, QString __usr, QString __pwd, QString __rank, QDate __date
+):
+    ign{__ign}, usr{__usr}, pwd{__pwd}, rank{__rank}, date{__date} {
 }
 QString AccountInfo::getInGameName()const {return ign;}
 QString AccountInfo::getUser() const{return usr;}
 QString AccountInfo::getPassword() const{return pwd;}
 QString AccountInfo::getStatus() const{return sts;}
+QString AccountInfo::getRank() const{return rank;}
 QDate AccountInfo::getDate() const{return date;}
 
 void AccountInfo::setInGameName(QString __ign){ign = __ign;}
@@ -16,10 +18,11 @@ void AccountInfo::setUser(QString __usr){usr = __usr;}
 void AccountInfo::setPassword(QString __pwd){pwd = __pwd;}
 void AccountInfo::setStatus(QString __sts){sts = __sts;}
 void AccountInfo::setDate(QDate __date){date = __date;}
+void AccountInfo::setRank(QString __rank){rank = __rank;}
 bool operator==(const AccountInfo& lhs, const QString& rhs){
     return lhs.usr == rhs;
 }
-QTextStream& operator<<(QTextStream& out, const AccountInfo acc){
+QTextStream& operator<<(QTextStream& out, const AccountInfo& acc){
     out << acc.getInGameName() << "\n";
     out << acc.getUser() << "\n";
     out << acc.getPassword() << "\n";
@@ -29,6 +32,8 @@ QTextStream& operator<<(QTextStream& out, const AccountInfo acc){
         out << acc.getDate().month() << "\n";
         out << acc.getDate().day() << "\n";
     }
+    out << acc.getRank() << "\n";
+
     return out;
 }
 QTextStream& operator>>(QTextStream& in, AccountInfo& acc){
@@ -47,5 +52,6 @@ QTextStream& operator>>(QTextStream& in, AccountInfo& acc){
     acc.setDate(QDate{yr.toInt(), mo.toInt(), day.toInt()});
     if(acc.date <= QDate::currentDate() && acc.date != QDate{})
         acc.sts = "Available";
+    acc.rank = in.readLine(AccountInfo::IN_BUFFER);
     return in;
 }

@@ -8,24 +8,28 @@
 class AccountInfo
 {
 private:
-    QString ign, usr, pwd, sts;
+    QString ign, usr, pwd, sts, rank;
     QDate date;
     static const int IN_BUFFER {100};
 public:
     AccountInfo();
-    AccountInfo(QString __ign, QString __usr, QString __pwd, QDate __date);
+    AccountInfo(
+        QString __ign, QString __usr, QString __pwd, QString __rank, QDate __date
+    );
     QString getInGameName() const;
     QString getUser() const;
     QString getPassword() const;
     QString getStatus() const;
+    QString getRank() const;
     QDate getDate() const;
     void setInGameName(QString ign);
     void setUser(QString usr);
     void setPassword(QString pwd);
     void setStatus(QString sts);
     void setDate(QDate date);
+    void setRank(QString __rank);
     friend bool operator==(const AccountInfo& lhs, const QString& rhs);
-    friend QTextStream& operator<<(QTextStream& out, const AccountInfo account);
+    friend QTextStream& operator<<(QTextStream& out, const AccountInfo& account);
     friend QTextStream& operator>>(QTextStream& in, AccountInfo& account);
 };
 
