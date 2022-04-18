@@ -176,15 +176,49 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     accLayouts[QString{"All"}].push_back(newLayout);
     accLayouts[acc.getStatus()].push_back(newLayout);
 
-    if(acc.getInGameName() != "-"){
+    if(acc.getInGameName() != "-" && acc.getStatus() != "Perma"){
         acc.setRank(getRankDetails(acc));
     }
 
     QLabel* rank = new QLabel{acc.getRank()};
+    QString style = "QLabel { ";
+    if(acc.getRank().contains("UNRANKED"))
+        style += "background-color : #ffffff;";
+    else if(acc.getRank().contains("IRON"))
+        style += "background-color : #696969;";
+    else if(acc.getRank().contains("BRONZE"))
+        style += "background-color : #987654;";
+    else if(acc.getRank().contains("SILVER"))
+        style += "background-color : #bebebe;";
+    else if(acc.getRank().contains("GOLD"))
+        style += "background-color : #ffd700;";
+    else if(acc.getRank().contains("PLATINUM"))
+        style += "background-color : #88d8c0;";
+    else if(acc.getRank().contains("DIAMOND"))
+        style += "background-color : #00b7eb;";
+    else if(acc.getRank().contains("GRANDMASTER"))
+        style += "background-color : #dc143c;";
+    else if(acc.getRank().contains("MASTER"))
+        style += "background-color : #9f00c5;";
+    else{
+        style += "background-color : #ffea70;";
+    }
+    style += "color : black;";
+    style += "font-weight: bold;";
+    style += "border-bottom-right-radius : 20px;";
+
+    if(acc.getRank().contains("CHALLENGER"))
+        style += "border: 2px solid #9bddff;}";
+    else
+        style += "border: 2px solid black;}";
+
+    rank->setStyleSheet(style);
+    rank->setAlignment(Qt::AlignCenter);
     newLayout->addWidget(rank);
     addToLayout(tab, newLayout);
 }
 
+//  might move this to AccountInfo
 QString AccountManager::getRankDetails(AccountInfo acc){
     QString *stream = new QString{acc.getInGameName() + "?api_key=" + KEY};
     auto manager = new QNetworkAccessManager();

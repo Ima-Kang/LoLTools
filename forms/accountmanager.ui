@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -264,6 +264,23 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="Line" name="line_25">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>Rank</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -391,6 +408,23 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="Line" name="line_24">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_23">
+            <property name="text">
+             <string>Rank</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -515,6 +549,23 @@
            <widget class="QLabel" name="label_16">
             <property name="text">
              <string>Status</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_23">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>Rank</string>
             </property>
            </widget>
           </item>
@@ -673,6 +724,8 @@
     <addaction name="separator"/>
     <addaction name="actionEdit_account"/>
     <addaction name="separator"/>
+    <addaction name="actionFind_Ctrl_F"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
@@ -704,6 +757,11 @@
   <action name="actionSort_All_Ctrl_S">
    <property name="text">
     <string>Sort All (Ctrl + S)</string>
+   </property>
+  </action>
+  <action name="actionFind_Ctrl_F">
+   <property name="text">
+    <string>Find (Ctrl + F)</string>
    </property>
   </action>
  </widget>
