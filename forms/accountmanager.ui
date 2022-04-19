@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -723,8 +723,6 @@
     <addaction name="actionRemove_account"/>
     <addaction name="separator"/>
     <addaction name="actionEdit_account"/>
-    <addaction name="separator"/>
-    <addaction name="actionFind_Ctrl_F"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuOptions"/>

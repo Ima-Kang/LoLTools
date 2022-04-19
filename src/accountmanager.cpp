@@ -4,6 +4,7 @@ AccountManager::AccountManager(QWidget *parent):
         QMainWindow(parent), ui(new Ui::AccountManager){
     ui->setupUi(this);
     setFixedSize(width(), height());
+    ui->tabWidget->setCurrentIndex(0);
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
     setWindowIcon(QIcon(":/imgs/ChampionSquare.bmp"));
     accLayouts.insert(QString{"All"}, QList<QHBoxLayout*>{});
@@ -176,10 +177,12 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     accLayouts[QString{"All"}].push_back(newLayout);
     accLayouts[acc.getStatus()].push_back(newLayout);
 
-    if(acc.getInGameName() != "-" && acc.getStatus() != "Perma"){
+    if(acc.getInGameName() != "-" &&
+        acc.getStatus() != "Perma" &&
+        acc.getStatus() != "Temp"){
         acc.setRank(getRankDetails(acc));
     }
-
+    qDebug() << acc.getRank();
     QLabel* rank = new QLabel{acc.getRank()};
     QString style = "QLabel { ";
     if(acc.getRank().contains("UNRANKED"))
@@ -200,8 +203,12 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
         style += "background-color : #dc143c;";
     else if(acc.getRank().contains("MASTER"))
         style += "background-color : #9f00c5;";
-    else{
+    else if(acc.getRank().contains("CHALLENGER"))
         style += "background-color : #ffea70;";
+    else{
+        style += "background-color : #ffffff;";
+        acc.setRank("UNRANKED");
+        rank->setText("UNRANKED");
     }
     style += "color : black;";
     style += "font-weight: bold;";
@@ -264,7 +271,7 @@ QString AccountManager::getRankDetails(AccountInfo acc){
                     + " lp"
                 );
             } else{
-                *stream = "UNRANKED";
+                *stream = acc.getRank();
             }
             reply->deleteLater();
         }
