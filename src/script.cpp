@@ -180,20 +180,21 @@ cv::Mat Script::captureScreenMat(HWND hwnd){
 
 void Script::captureScreen(bool* e){
     while(true)
-        if(*e)
+        if(*e){
             *frame = captureScreenMat(HWND{GetDesktopWindow()});
+        }
 }
 
 cv::Point Script::processFrame(QString object){
-    cv::Mat templ, result, img_display;  //  gonna need to move frame
+    cv::Mat currentFrame, templ, result, img_display;  //  gonna need to move frame
     QImage f2(object);
     //":/imgs/accept.png"
-    //frame = captureScreenMat(HWND{GetDesktopWindow()});
+    currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
     templ = QImageToMat(f2);
 
-    frame -> copyTo(img_display);
+    currentFrame.copyTo(img_display);
 
-    if(frame -> empty() || templ.empty()){
+    if(currentFrame.empty() || templ.empty()){
         qDebug() << "Can't read one of the images\n";
         return cv::Point{-1, -1};
     }
@@ -201,7 +202,8 @@ cv::Point Script::processFrame(QString object){
     cv::Point minLoc, maxLoc, matchLoc;
     double minVal, maxVal, threshold = 0.95;
 
-    cv::matchTemplate(*frame, templ, result, cv::TM_CCOEFF_NORMED);
+    cv::matchTemplate(currentFrame, templ, result, cv::TM_CCOEFF_NORMED);
+
     cv::threshold(result, result, threshold, 1., cv::THRESH_TOZERO);
     cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
     cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat() );
