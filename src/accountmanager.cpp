@@ -10,6 +10,8 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Available"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Temp"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
+    scripts = new Script{};
+
     loadAccounts();
     updateDetails();
 }
@@ -376,7 +378,6 @@ void AccountManager::on_actionEdit_account_triggered(){
 }
 
 void AccountManager::on_actionEnableAccept_triggered(){
-    auto test = new Script{"test"};
-    test->processFrame();
+    scripts -> acceptTrigger();
 }
 

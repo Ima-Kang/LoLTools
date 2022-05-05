@@ -44,6 +44,7 @@ private slots:
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;
+    Script* scripts;
 
     QHash<int, bool> keysPressed;
     QHash<QString, QFrame*> mUserToLayoutMap;

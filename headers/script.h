@@ -10,15 +10,40 @@
 #include <QImage>
 #include <QTransform>
 #include <QDebug>
+#include <QThread>
+#include <chrono>
+#include <QHash>
+#include <functional>
 
-class Script
-{
-private:
-    QString script;
-public:
-    Script(QString script);
-    void setScript(QString script);
-    void processFrame();
+class Script{
+    private slots:
+
+    private:
+        QHash<int, bool> keys;
+        QThread* keyThread;
+        QThread* hotkeyThread;
+
+        void monitorKeys();
+    public:
+        enum type{
+            Accept
+        };
+        bool enabled = false;
+        QHash<int, QThread*> script;
+        QHash<int, bool> enabledScripts;
+
+        Script();
+        cv::Point processFrame(QString object);
+        cv::Mat QImageToMat(QImage image);
+        cv::Mat captureScreenMat(HWND hwnd);
+        BITMAPINFOHEADER createBitmapHeader(int width, int height);
+
+        void exec(type script);
+        void genThread(type __type);
+
+        void accept();
+        void acceptTrigger();
+        void monitorHotkeys();
 };
 
 #endif // SCRIPT_H
