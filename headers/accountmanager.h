@@ -6,6 +6,7 @@
 #include "ui_accountmanager.h"
 #include "adddialog.h"
 #include "removedialog.h"
+#include "script.h"
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -18,6 +19,8 @@
 #include <QTextStream>
 #include <QDir>
 #include <QClipboard>
+#include <QStyle>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -36,18 +39,20 @@ private slots:
     void populateLayout();
     void on_actionEdit_account_triggered();
 
+    void on_actionEnableAccept_triggered();
+
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;
 
     QHash<int, bool> keysPressed;
-    QHash<QString, QHBoxLayout*> mUserToLayoutMap;
-    QHash<QString, QList<QHBoxLayout*>> accLayouts;
+    QHash<QString, QFrame*> mUserToLayoutMap;
+    QHash<QString, QList<QFrame*>> accLayouts;
 
     QVBoxLayout* getCurrentLayout();
     void updateDetails();
     void generateAccountLayout(AccountInfo& acc);
-    void addToLayout(QVBoxLayout* layout, QHBoxLayout* accLayout);
+    void addToLayout(QVBoxLayout* layout, QFrame* accLayout);
     void keyReleaseEvent(QKeyEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     void remove_from_layouts(QString usr);

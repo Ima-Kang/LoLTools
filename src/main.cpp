@@ -1,4 +1,4 @@
-#include "accountmanager.h"
+#include "../headers/accountmanager.h"
 
 #include <QApplication>
 

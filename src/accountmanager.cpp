@@ -1,4 +1,4 @@
-#include "accountmanager.h"
+#include "../headers/accountmanager.h"
 
 AccountManager::AccountManager(QWidget *parent):
         QMainWindow(parent), ui(new Ui::AccountManager){
@@ -6,10 +6,10 @@ AccountManager::AccountManager(QWidget *parent):
     setFixedSize(width(), height());
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
     setWindowIcon(QIcon(":/imgs/ChampionSquare.bmp"));
-    accLayouts.insert(QString{"All"}, QList<QHBoxLayout*>{});
-    accLayouts.insert(QString{"Available"}, QList<QHBoxLayout*>{});
-    accLayouts.insert(QString{"Temp"}, QList<QHBoxLayout*>{});
-    accLayouts.insert(QString{"Perma"}, QList<QHBoxLayout*>{});
+    accLayouts.insert(QString{"All"}, QList<QFrame*>{});
+    accLayouts.insert(QString{"Available"}, QList<QFrame*>{});
+    accLayouts.insert(QString{"Temp"}, QList<QFrame*>{});
+    accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
     loadAccounts();
     updateDetails();
 }
@@ -102,8 +102,10 @@ void AccountManager::populateLayout(){
     } else if(index == 3){
         tabName = "Perma";
     }
-    for(auto hbl : accLayouts[tabName]){
-        hbl->setParent(nullptr);
+
+    auto list = accLayouts[tabName];
+    for(auto& hbl : list){
+        //hbl->setParent(nullptr);
         addToLayout(tab, hbl);
     }
     updateRowNumber();
@@ -111,19 +113,37 @@ void AccountManager::populateLayout(){
 
 void AccountManager::onButtonCopy(){
     QPushButton* button = qobject_cast<QPushButton*>(sender());
+    QFrame* selectedFrame = qobject_cast<QFrame*>(button -> parent());
+    QString style{".QFrame{background-color: rgba(255, 255, 255, 20%);"};
+    style += "border-radius: 3px;";
+    style += " border: 1px solid #2ee6e6;}";
+    for(auto& frame : mUserToLayoutMap){
+        if(frame != selectedFrame)
+            frame -> setStyleSheet("");
+    }
+    selectedFrame -> setStyleSheet(style);
+
     QClipboard *clipboard = QGuiApplication::clipboard();
     clipboard->setText(button->text());
 }
 
-void AccountManager::addToLayout(QVBoxLayout* layout, QHBoxLayout* newLayout){
+void AccountManager::addToLayout(QVBoxLayout* layout, QFrame* newLayout){
     QVBoxLayout* rootLayout = qobject_cast<QVBoxLayout*>(layout->layout());
-    rootLayout->insertLayout(layout->count() - 1, newLayout);
+    rootLayout->insertWidget(layout->count() - 1, newLayout);
 }
 
 void AccountManager::generateAccountLayout(AccountInfo& acc){
     QVBoxLayout* tab = getCurrentLayout();
     QHBoxLayout* newLayout = new QHBoxLayout();
+    newLayout -> setContentsMargins(4, 4, 4, 4);
+
     QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
+
+    QFrame* frame = new QFrame();
+
+    frame -> setLayoutDirection(Qt::LayoutDirection::LeftToRight);
+    frame -> setLayout(newLayout);
+    frame -> setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     number->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     number->setMinimumWidth(25);
@@ -162,11 +182,11 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     newLayout->addWidget(statusButton);
     newLayout->setSpacing(5);
 
-    mUserToLayoutMap.insert(acc.getUser(), newLayout);
-    accLayouts[QString{"All"}].push_back(newLayout);
-    accLayouts[acc.getStatus()].push_back(newLayout);
+    mUserToLayoutMap.insert(acc.getUser(), frame);
+    accLayouts[QString{"All"}].push_back(frame);
+    accLayouts[acc.getStatus()].push_back(frame);
 
-    addToLayout(tab, newLayout);
+    addToLayout(tab, frame);
 }
 
 void AccountManager::onStatusChange(){
@@ -227,11 +247,12 @@ void AccountManager::on_actionAdd_account_triggered(){
 }
 
 void AccountManager::remove_from_layouts(QString usr){
-    QHBoxLayout* selectedLayout = mUserToLayoutMap.take(usr);
+    QFrame* selectedFrame = mUserToLayoutMap.take(usr);
+    QHBoxLayout* selectedLayout = (QHBoxLayout*)selectedFrame->layout();
     accounts.remove(accounts.indexOf(usr));
 
     for(auto list = accLayouts.begin(); list != accLayouts.end(); ++list){
-        auto idx = (*list).indexOf(selectedLayout);
+        auto idx = (*list).indexOf(selectedFrame);
         if(idx != -1)
             (*list).remove(idx);
     }
@@ -244,6 +265,7 @@ void AccountManager::remove_from_layouts(QString usr){
         }
     }
     delete selectedLayout;
+    delete selectedFrame;
 };
 
 void AccountManager::on_actionRemove_account_triggered(){
@@ -271,10 +293,11 @@ void AccountManager::updateRowNumber(){
         tabName = "Perma";
     }
     auto list = accLayouts[tabName];
-    for(auto& hbl : list){
+    for(auto& frame : list){
+        auto hbl = frame->layout();
         qobject_cast<QLabel*>(hbl->itemAt(0)->widget())->
             setText("#" + QString{std::to_string(
-            getCurrentLayout()->indexOf(hbl) + 1).c_str()}
+            getCurrentLayout()->indexOf(frame) + 1).c_str()}
         );
     }
 }
@@ -327,13 +350,14 @@ void AccountManager::on_actionEdit_account_triggered(){
         return;
     }
     //  Removing from old container and placing it in the new container
-    QHBoxLayout* selectedLayout = mUserToLayoutMap.take(editDialog.getSelectedUser());
+    QFrame* selectedFrame = mUserToLayoutMap.take(editDialog.getSelectedUser());
+    QHBoxLayout* selectedLayout = (QHBoxLayout*)selectedFrame->layout();
     AccountInfo ai = (AccountInfo)editDialog;
     auto oldStatus = accounts.at(accounts.indexOf(editDialog.getSelectedUser())).getStatus();
 
-    mUserToLayoutMap[editDialog.getUser()] = selectedLayout;
-    accLayouts[oldStatus].removeAt(accLayouts[oldStatus].indexOf(selectedLayout));
-    accLayouts[ai.getStatus()].push_back(selectedLayout);
+    mUserToLayoutMap[editDialog.getUser()] = selectedFrame;
+    accLayouts[oldStatus].removeAt(accLayouts[oldStatus].indexOf(selectedFrame));
+    accLayouts[ai.getStatus()].push_back(selectedFrame);
 
 
     qobject_cast<QPushButton*>(selectedLayout->itemAt(1)->widget())->
@@ -351,7 +375,8 @@ void AccountManager::on_actionEdit_account_triggered(){
     updateDetails();
 }
 
-
-
-
+void AccountManager::on_actionEnableAccept_triggered(){
+    auto test = new Script{"test"};
+    test->processFrame();
+}
 

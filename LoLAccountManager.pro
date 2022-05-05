@@ -8,7 +8,9 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-RC_ICONS = ChampionSquare.ico
+RC_ICONS = res/ChampionSquare.ico
+
+LIBS += -luser32
 
 SOURCES += \
     src/accountinfo.cpp \
@@ -16,14 +18,16 @@ SOURCES += \
     src/editdialog.cpp \
     src/main.cpp \
     src/accountmanager.cpp \
-    src/removedialog.cpp
+    src/removedialog.cpp \
+    src/script.cpp
 
 HEADERS += \
     headers/accountinfo.h \
     headers/accountmanager.h \
     headers/adddialog.h \
     headers/editdialog.h \
-    headers/removedialog.h
+    headers/removedialog.h \
+    headers/script.h
 
 FORMS += \
     forms/accountmanager.ui \
@@ -40,3 +44,11 @@ DISTFILES +=
 
 RESOURCES += \
     res/qss.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../opencv-4.5.4/opencv/build/x64/vc15/lib/ -lopencv_world454
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../opencv-4.5.4/opencv/build/x64/vc15/lib/ -lopencv_world454d
+
+INCLUDEPATH += $$PWD/../../../../../opencv-4.5.4/opencv/build/include
+DEPENDPATH += $$PWD/../../../../../opencv-4.5.4/opencv/build/include
+
+win32: LIBS += -lGdi32

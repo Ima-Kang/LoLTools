@@ -3,6 +3,11 @@
         <file>Combinear.qss</file>
     </qresource>
     <qresource prefix="/imgs">
-        <file>ChampionSquare.bmp</file>
+        <file>ChampionSquare.ico</file>
+        <file>accept.png</file>
+        <file>ban.png</file>
+        <file>lock_in.png</file>
+        <file>none.png</file>
+        <file>search.png</file>
     </qresource>
 </RCC>

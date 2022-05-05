@@ -171,7 +171,7 @@ QPushButton
 
 QPushButton::flat
 {
-	background-color: transparent;
+        background-color: transparent;
 	border: none;
 	color: #fff;
 
@@ -189,7 +189,7 @@ QPushButton::disabled
 
 QPushButton::hover
 {
-        background-color: rgba(54, 201, 201, 20%);
+        background-color: rgba(54, 201, 201, 40%);
         border: 1px solid #2ee6e6;
 
 }

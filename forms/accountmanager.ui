@@ -537,6 +537,11 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Page</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
     <item>
@@ -657,7 +662,54 @@
     <addaction name="actionEdit_account"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menuScripts">
+    <property name="title">
+     <string>Scripts</string>
+    </property>
+    <widget class="QMenu" name="menuAuto_Report">
+     <property name="title">
+      <string>Auto Report</string>
+     </property>
+     <addaction name="actionEnable"/>
+     <addaction name="separator"/>
+     <addaction name="actionSettings"/>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuAuto_Int">
+     <property name="title">
+      <string>Auto Int</string>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionEnable_2"/>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuAuto_Accept">
+     <property name="title">
+      <string>Auto Accept</string>
+     </property>
+     <addaction name="actionEnableAccept"/>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menuAuto_Select">
+     <property name="title">
+      <string>Auto Select</string>
+     </property>
+     <addaction name="actionEnable_3"/>
+     <addaction name="separator"/>
+     <addaction name="actionSettings_4"/>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="menuAuto_Report"/>
+    <addaction name="separator"/>
+    <addaction name="menuAuto_Int"/>
+    <addaction name="separator"/>
+    <addaction name="menuAuto_Accept"/>
+    <addaction name="separator"/>
+    <addaction name="menuAuto_Select"/>
+   </widget>
    <addaction name="menuOptions"/>
+   <addaction name="menuScripts"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAdd_account">
@@ -687,6 +739,46 @@
   <action name="actionSort_All_Ctrl_S">
    <property name="text">
     <string>Sort All (Ctrl + S)</string>
+   </property>
+  </action>
+  <action name="actionEnable">
+   <property name="text">
+    <string>Enable</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionEnable_2">
+   <property name="text">
+    <string>Enable</string>
+   </property>
+  </action>
+  <action name="actionSettings_2">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionEnable_3">
+   <property name="text">
+    <string>Enable</string>
+   </property>
+  </action>
+  <action name="actionSettings_3">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionSettings_4">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionEnableAccept">
+   <property name="text">
+    <string>Enable</string>
    </property>
   </action>
  </widget>
