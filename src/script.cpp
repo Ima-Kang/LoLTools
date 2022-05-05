@@ -102,16 +102,19 @@ void Script::processFrame(){
     }
 
     cv::Point minLoc, maxLoc, matchLoc;
-    double minVal, maxVal;
+    double minVal, maxVal, threshold = 0.95;
 
     cv::matchTemplate(frame, templ, result, cv::TM_CCOEFF_NORMED);
-
+    cv::threshold(result, result, threshold, 1., cv::THRESH_TOZERO);
     cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
     cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat() );
-    matchLoc = maxLoc;  //  take higher val for TM_COEFF_NORMED
 
-    cv::Scalar colorScalar = cv::Scalar(0, 255, 0);
-    cv::Point rec{matchLoc.x + templ.cols , matchLoc.y + templ.rows};
-    rectangle(img_display, matchLoc, rec, colorScalar, 2, 8, 0 );
+    if(maxVal >= threshold){
+        matchLoc = maxLoc;  //  take higher val for TM_COEFF_NORMED
+        cv::Scalar colorScalar = cv::Scalar(0, 255, 0);
+        cv::Point rec{matchLoc.x + templ.cols , matchLoc.y + templ.rows};
+        rectangle(img_display, matchLoc, rec, colorScalar, 2, 8, 0 );
+    }
+
     imshow("", img_display);
 }
