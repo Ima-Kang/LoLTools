@@ -3,8 +3,14 @@
 void monitorKeys(Script* s);
 
 Script::Script(){
+    frame = new cv::Mat{};
+    enabled = bool{false};
+
     keyThread = QThread::create([this](){monitorKeys();});
     hotkeyThread = QThread::create([this](){monitorHotkeys();});
+    screenCapture = QThread::create([this](){captureScreen(&enabled);});
+
+    screenCapture -> start();
     keyThread -> start();
     hotkeyThread -> start();
     genThread(type::Accept);
@@ -38,7 +44,7 @@ void Script::monitorHotkeys(){
     while(true){
         while(enabled){
             if(keys[VK_LCONTROL] && keys[VK_LSHIFT]){
-                if(keys['A']){
+                if(keys['A'] && enabledScripts[Script::type::Accept]){
                     acceptTrigger();
                     std::this_thread::sleep_for(
                         std::chrono::milliseconds(1000)
@@ -172,16 +178,22 @@ cv::Mat Script::captureScreenMat(HWND hwnd){
     return src;
 }
 
+void Script::captureScreen(bool* e){
+    while(true)
+        if(*e)
+            *frame = captureScreenMat(HWND{GetDesktopWindow()});
+}
+
 cv::Point Script::processFrame(QString object){
-    cv::Mat frame, templ, result, img_display;
+    cv::Mat templ, result, img_display;  //  gonna need to move frame
     QImage f2(object);
     //":/imgs/accept.png"
-    frame = captureScreenMat(HWND{GetDesktopWindow()});
+    //frame = captureScreenMat(HWND{GetDesktopWindow()});
     templ = QImageToMat(f2);
 
-    frame.copyTo(img_display);
+    frame -> copyTo(img_display);
 
-    if(frame.empty() || templ.empty()){
+    if(frame -> empty() || templ.empty()){
         qDebug() << "Can't read one of the images\n";
         return cv::Point{-1, -1};
     }
@@ -189,7 +201,7 @@ cv::Point Script::processFrame(QString object){
     cv::Point minLoc, maxLoc, matchLoc;
     double minVal, maxVal, threshold = 0.95;
 
-    cv::matchTemplate(frame, templ, result, cv::TM_CCOEFF_NORMED);
+    cv::matchTemplate(*frame, templ, result, cv::TM_CCOEFF_NORMED);
     cv::threshold(result, result, threshold, 1., cv::THRESH_TOZERO);
     cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
     cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat() );

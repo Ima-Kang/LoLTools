@@ -16,19 +16,19 @@
 #include <functional>
 
 class Script{
-    private slots:
-
     private:
         QHash<int, bool> keys;
         QThread* keyThread;
         QThread* hotkeyThread;
+        QThread* screenCapture;
+        cv::Mat* frame;
 
         void monitorKeys();
     public:
         enum type{
             Accept
         };
-        bool enabled = false;
+        bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
 
@@ -44,6 +44,7 @@ class Script{
         void accept();
         void acceptTrigger();
         void monitorHotkeys();
+        void captureScreen(bool* e);
 };
 
 #endif // SCRIPT_H
