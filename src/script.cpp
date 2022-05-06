@@ -102,7 +102,8 @@ void Script::accept(){
 
     while(!keys['A'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         p = processFrame(":/imgs/accept.png");
-        if(p != cv::Point{-1,-1}){
+        if(p != cv::Point{-1, -1}){
+            p += cv::Point{100, 30};
             SetCursorPos(p.x, p.y);
 
             auto key = new INPUT{};
@@ -111,6 +112,7 @@ void Script::accept(){
             SendInput(1, key, sizeof(INPUT));
             key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
             SendInput(1, key, sizeof(INPUT));
+            delete key;
             //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
         if(!enabledScripts[type::Accept])
@@ -153,6 +155,7 @@ void Script::reportPlayer(cv::Point p){
     SendInput(1, key, sizeof(INPUT));
     key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
     SendInput(1, key, sizeof(INPUT));
+    delete key;
 }
 
 void Script::report(){
@@ -174,6 +177,7 @@ void Script::report(){
                 key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
                 SendInput(1, key, sizeof(INPUT));
                 reportPlayer(p);
+                delete key;
             }
             break;
         }
@@ -291,7 +295,7 @@ cv::Point Script::processFrame(QString object){
     }
 
     cv::Point minLoc, maxLoc, matchLoc;
-    double minVal, maxVal, threshold = 0.99;
+    double minVal, maxVal, threshold = (object == ":/imgs/pgl.png") ? 0.3 : 0.99;
 
     cv::matchTemplate(currentFrame, templ, result, cv::TM_CCOEFF_NORMED);
 
