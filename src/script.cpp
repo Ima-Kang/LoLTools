@@ -5,16 +5,14 @@ Script::Script(){
     frame = new cv::Mat{};
     enabled = bool{false};
 
-    keyThread = QThread::create([this](){monitorKeys();});
-    hotkeyThread = QThread::create([this](){monitorHotkeys();});
-    screenCapture = QThread::create([this](){captureScreen(&enabled);});
-
-    screenCapture -> start();
-    keyThread -> start();
-    hotkeyThread -> start();
-
     genThread(type::Accept);
     genThread(type::Report);
+
+    keyThread = QThread::create([this](){monitorKeys();});
+    hotkeyThread = QThread::create([this](){monitorHotkeys();});
+
+    keyThread -> start();
+    hotkeyThread -> start();
 }
 
 void Script::acceptTrigger(){
@@ -62,32 +60,30 @@ void Script::genThread(type __type){
 }
 void Script::monitorHotkeys(){
     while(true){
-        while(enabled){
-            if(keys[VK_LCONTROL] && keys[VK_LSHIFT]){
-                if(keys['A'] && enabledScripts[Script::type::Accept]){
-                    acceptTrigger();
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(1000)
-                    );
-                }
-                if(keys['R'] && enabledScripts[Script::type::Report]){
-                    reportTrigger();
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(1000)
-                    );
-                }
+        if(keys[VK_LCONTROL] && keys[VK_LSHIFT]){
+            if(keys['A'] && !enabledScripts[Script::type::Accept]){
+                //acceptTrigger();
+                script[Script::type::Accept] -> start();
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(1000)
+                );
+            }
+            if(keys['R'] && !enabledScripts[Script::type::Report]){
+                //reportTrigger();
+                script[Script::type::Report] -> start();
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(1000)
+                );
             }
         }
     }
 }
 void Script::monitorKeys(){
     while(true){
-        while(enabled){
-            keys['A'] = GetAsyncKeyState('A');
-            keys['R'] = GetAsyncKeyState('R');
-            keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL);
-            keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT);
-        }
+        keys['A'] = GetAsyncKeyState('A');
+        keys['R'] = GetAsyncKeyState('R');
+        keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL);
+        keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT);
     }
 }
 
@@ -99,6 +95,7 @@ void Script::exec(type __script){
 }
 void Script::accept(){
     cv::Point p;
+    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['A'] = false;
 
     while(!keys['A'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         p = processFrame(":/imgs/accept.png");
@@ -126,6 +123,7 @@ void Script::reportPlayer(cv::Point p){
     auto key = new INPUT{};
     key -> type = INPUT_MOUSE;
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel += p;
     SetCursorPos(rel.x, rel.y);
     key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -133,6 +131,7 @@ void Script::reportPlayer(cv::Point p){
     key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
     SendInput(1, key, sizeof(INPUT));
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel.y = p.y + 277;
     SetCursorPos(rel.x, rel.y);
     key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -140,6 +139,7 @@ void Script::reportPlayer(cv::Point p){
     key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
     SendInput(1, key, sizeof(INPUT));
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel.y = p.y + 353;
     SetCursorPos(rel.x, rel.y);
     key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -147,7 +147,7 @@ void Script::reportPlayer(cv::Point p){
     key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
     SendInput(1, key, sizeof(INPUT));
 
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel.y = p.y + 600;
     rel.x += 200;
     SetCursorPos(rel.x, rel.y);
@@ -160,6 +160,8 @@ void Script::reportPlayer(cv::Point p){
 
 void Script::report(){
     cv::Point p, rel;
+    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['R'] = false;
+
     while(!keys['R'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         rel = p = processFrame(":/imgs/pgl.png");
         if(p != cv::Point{-1,-1}){
@@ -169,7 +171,7 @@ void Script::report(){
                     rel.x,
                     rel.y + i*35 + (i > 3 ? 8 : 0)
                 );
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 auto key = new INPUT{};
                 key -> type = INPUT_MOUSE;
                 key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;

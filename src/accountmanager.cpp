@@ -384,5 +384,6 @@ void AccountManager::on_actionEnableAccept_triggered(){
 
 void AccountManager::on_actionEnableReport_triggered(){
     scripts -> reportTrigger();
+    //RegisterHotKey(NULL, 1, MOD_ALT | 0x4000, 0x42);
 }
 
