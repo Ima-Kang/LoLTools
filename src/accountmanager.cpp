@@ -10,7 +10,16 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Available"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Temp"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
+
     scripts = new Script{};
+    hotkeyA = new Hotkey();
+    hotkeyR = new Hotkey();
+
+    hotkeyA->registerHotkey(QKeySequence { "Ctrl+Shift+A" });
+    hotkeyR->registerHotkey(QKeySequence { "Ctrl+Shift+R" });
+
+    connect(hotkeyA, SIGNAL(activated()), this, SLOT(on_actionEnableAccept_triggered()));
+    connect(hotkeyR, SIGNAL(activated()), this, SLOT(on_actionEnableReport_triggered()));
 
     loadAccounts();
     updateDetails();
@@ -380,7 +389,6 @@ void AccountManager::on_actionEdit_account_triggered(){
 void AccountManager::on_actionEnableAccept_triggered(){
     scripts -> acceptTrigger();
 }
-
 
 void AccountManager::on_actionEnableReport_triggered(){
     scripts -> reportTrigger();

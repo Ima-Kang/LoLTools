@@ -2,17 +2,13 @@
 
 void monitorKeys(Script* s);
 Script::Script(){
-    frame = new cv::Mat{};
     enabled = bool{false};
 
     genThread(type::Accept);
     genThread(type::Report);
 
     keyThread = QThread::create([this](){monitorKeys();});
-    hotkeyThread = QThread::create([this](){monitorHotkeys();});
-
     keyThread -> start();
-    hotkeyThread -> start();
 }
 
 void Script::acceptTrigger(){
@@ -24,10 +20,8 @@ void Script::acceptTrigger(){
     if(enabledScripts[Script::type::Accept]){
         enabledScripts[Script::type::Accept] = false;
         accept -> wait();
-        qDebug() << "STOP";
     }
     else if(!enabledScripts[Script::type::Accept]){
-        qDebug() << "START";
         exec(Script::type::Accept);
     }
 }
@@ -58,26 +52,7 @@ void Script::genThread(type __type){
         break;
     }
 }
-void Script::monitorHotkeys(){
-    while(true){
-        if(keys[VK_LCONTROL] && keys[VK_LSHIFT]){
-            if(keys['A'] && !enabledScripts[Script::type::Accept]){
-                //acceptTrigger();
-                script[Script::type::Accept] -> start();
-                std::this_thread::sleep_for(
-                    std::chrono::milliseconds(1000)
-                );
-            }
-            if(keys['R'] && !enabledScripts[Script::type::Report]){
-                //reportTrigger();
-                script[Script::type::Report] -> start();
-                std::this_thread::sleep_for(
-                    std::chrono::milliseconds(1000)
-                );
-            }
-        }
-    }
-}
+
 void Script::monitorKeys(){
     while(true){
         keys['A'] = GetAsyncKeyState('A');
@@ -110,7 +85,6 @@ void Script::accept(){
             key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
             SendInput(1, key, sizeof(INPUT));
             delete key;
-            //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
         if(!enabledScripts[type::Accept])
             break;
@@ -275,17 +249,10 @@ cv::Mat Script::captureScreenMat(HWND hwnd){
     return src;
 }
 
-void Script::captureScreen(bool* e){
-    while(true)
-        if(*e){
-            *frame = captureScreenMat(HWND{GetDesktopWindow()});
-        }
-}
-
 cv::Point Script::processFrame(QString object){
     cv::Mat currentFrame, templ, result, img_display;  //  gonna need to move frame
     QImage f2(object);
-    //":/imgs/accept.png"
+
     currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
     templ = QImageToMat(f2);
 
@@ -307,12 +274,4 @@ cv::Point Script::processFrame(QString object){
     matchLoc = maxLoc;
 
     return maxVal >= threshold ? matchLoc : cv::Point{-1, -1};
-//    if(maxVal >= threshold){
-//        matchLoc = maxLoc;  //  take higher val for TM_COEFF_NORMED
-//        cv::Scalar colorScalar = cv::Scalar(0, 255, 0);
-//        cv::Point rec{matchLoc.x + templ.cols , matchLoc.y + templ.rows};
-//        rectangle(img_display, matchLoc, rec, colorScalar, 2, 8, 0 );
-//        return matchLoc;
-//    }
-//    imshow("", img_display);
 }

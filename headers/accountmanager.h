@@ -7,6 +7,7 @@
 #include "adddialog.h"
 #include "removedialog.h"
 #include "script.h"
+#include "hotkey.h"
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -20,7 +21,6 @@
 #include <QDir>
 #include <QClipboard>
 #include <QStyle>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -38,16 +38,16 @@ private slots:
     void on_actionRemove_account_triggered();
     void populateLayout();
     void on_actionEdit_account_triggered();
-
     void on_actionEnableAccept_triggered();
-
     void on_actionEnableReport_triggered();
 
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;
     Script* scripts;
-
+    //  Global hotkeys
+    Hotkey* hotkeyA;
+    Hotkey* hotkeyR;
     QHash<int, bool> keysPressed;
     QHash<QString, QFrame*> mUserToLayoutMap;
     QHash<QString, QList<QFrame*>> accLayouts;

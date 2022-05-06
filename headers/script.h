@@ -19,9 +19,6 @@ class Script{
     private:
         QHash<int, bool> keys;
         QThread* keyThread;
-        QThread* hotkeyThread;
-        QThread* screenCapture;
-        cv::Mat* frame;
 
         void monitorKeys();
     public:
@@ -47,9 +44,6 @@ class Script{
         void report();
         void reportTrigger();
         void reportPlayer(cv::Point p);
-
-        void monitorHotkeys();
-        void captureScreen(bool* e);
 };
 
 #endif // SCRIPT_H
