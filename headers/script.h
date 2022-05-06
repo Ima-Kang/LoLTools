@@ -26,7 +26,8 @@ class Script{
         void monitorKeys();
     public:
         enum type{
-            Accept
+            Accept,
+            Report
         };
         bool enabled;
         QHash<int, QThread*> script;
@@ -43,6 +44,10 @@ class Script{
 
         void accept();
         void acceptTrigger();
+        void report();
+        void reportTrigger();
+        void reportPlayer(cv::Point p);
+
         void monitorHotkeys();
         void captureScreen(bool* e);
 };

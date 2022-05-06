@@ -1,7 +1,6 @@
 #include "../headers/script.h"
 
 void monitorKeys(Script* s);
-
 Script::Script(){
     frame = new cv::Mat{};
     enabled = bool{false};
@@ -13,7 +12,9 @@ Script::Script(){
     screenCapture -> start();
     keyThread -> start();
     hotkeyThread -> start();
+
     genThread(type::Accept);
+    genThread(type::Report);
 }
 
 void Script::acceptTrigger(){
@@ -33,10 +34,29 @@ void Script::acceptTrigger(){
     }
 }
 
+void Script::reportTrigger(){
+    auto report = script[Script::type::Report];
+    if(report->isFinished()){
+        genThread(Script::type::Report);
+    }
+
+    if(enabledScripts[Script::type::Report]){
+        enabledScripts[Script::type::Report] = false;
+        report -> wait();
+        qDebug() << "STOP";
+    }
+    else if(!enabledScripts[Script::type::Report]){
+        qDebug() << "START";
+        exec(Script::type::Report);
+    }
+}
+
 void Script::genThread(type __type){
     switch(__type){
         case type::Accept:
             script[type::Accept] = QThread::create([this](){accept();});
+        case type::Report:
+            script[type::Report] = QThread::create([this](){report();});
         break;
     }
 }
@@ -50,6 +70,12 @@ void Script::monitorHotkeys(){
                         std::chrono::milliseconds(1000)
                     );
                 }
+                if(keys['R'] && enabledScripts[Script::type::Report]){
+                    reportTrigger();
+                    std::this_thread::sleep_for(
+                        std::chrono::milliseconds(1000)
+                    );
+                }
             }
         }
     }
@@ -58,6 +84,7 @@ void Script::monitorKeys(){
     while(true){
         while(enabled){
             keys['A'] = GetAsyncKeyState('A');
+            keys['R'] = GetAsyncKeyState('R');
             keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL);
             keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT);
         }
@@ -90,6 +117,70 @@ void Script::accept(){
             break;
     }
     enabledScripts[type::Accept] = false;
+}
+
+void Script::reportPlayer(cv::Point p){
+    cv::Point rel{438, 232};
+    auto key = new INPUT{};
+    key -> type = INPUT_MOUSE;
+
+    rel += p;
+    SetCursorPos(rel.x, rel.y);
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+    SendInput(1, key, sizeof(INPUT));
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, key, sizeof(INPUT));
+
+    rel.y = p.y + 277;
+    SetCursorPos(rel.x, rel.y);
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+    SendInput(1, key, sizeof(INPUT));
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, key, sizeof(INPUT));
+
+    rel.y = p.y + 353;
+    SetCursorPos(rel.x, rel.y);
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+    SendInput(1, key, sizeof(INPUT));
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, key, sizeof(INPUT));
+
+
+    rel.y = p.y + 600;
+    rel.x += 200;
+    SetCursorPos(rel.x, rel.y);
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+    SendInput(1, key, sizeof(INPUT));
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, key, sizeof(INPUT));
+}
+
+void Script::report(){
+    cv::Point p, rel;
+    while(!keys['R'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
+        rel = p = processFrame(":/imgs/pgl.png");
+        if(p != cv::Point{-1,-1}){
+            rel += cv::Point{165, 156}; // +35
+            for(int i = 0; i < 10; i++){
+                SetCursorPos(
+                    rel.x,
+                    rel.y + i*35 + (i > 3 ? 8 : 0)
+                );
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                auto key = new INPUT{};
+                key -> type = INPUT_MOUSE;
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+                SendInput(1, key, sizeof(INPUT));
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                SendInput(1, key, sizeof(INPUT));
+                reportPlayer(p);
+            }
+            break;
+        }
+        if(!enabledScripts[type::Report])
+            break;
+    }
+    enabledScripts[type::Report] = false;
 }
 
 cv::Mat Script::QImageToMat(QImage image){
@@ -200,7 +291,7 @@ cv::Point Script::processFrame(QString object){
     }
 
     cv::Point minLoc, maxLoc, matchLoc;
-    double minVal, maxVal, threshold = 0.95;
+    double minVal, maxVal, threshold = 0.99;
 
     cv::matchTemplate(currentFrame, templ, result, cv::TM_CCOEFF_NORMED);
 

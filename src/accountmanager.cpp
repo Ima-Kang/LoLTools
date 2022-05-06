@@ -381,3 +381,8 @@ void AccountManager::on_actionEnableAccept_triggered(){
     scripts -> acceptTrigger();
 }
 
+
+void AccountManager::on_actionEnableReport_triggered(){
+    scripts -> reportTrigger();
+}
+

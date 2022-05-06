@@ -41,6 +41,8 @@ private slots:
 
     void on_actionEnableAccept_triggered();
 
+    void on_actionEnableReport_triggered();
+
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;

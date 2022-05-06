@@ -9,5 +9,8 @@
         <file>lock_in.png</file>
         <file>none.png</file>
         <file>search.png</file>
+        <file>pgl.png</file>
+        <file>report.png</file>
+        <file>box.png</file>
     </qresource>
 </RCC>

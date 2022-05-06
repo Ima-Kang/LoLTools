@@ -670,7 +670,7 @@
      <property name="title">
       <string>Auto Report</string>
      </property>
-     <addaction name="actionEnable"/>
+     <addaction name="actionEnableReport"/>
      <addaction name="separator"/>
      <addaction name="actionSettings"/>
      <addaction name="separator"/>
@@ -741,7 +741,7 @@
     <string>Sort All (Ctrl + S)</string>
    </property>
   </action>
-  <action name="actionEnable">
+  <action name="actionEnableReport">
    <property name="text">
     <string>Enable</string>
    </property>
