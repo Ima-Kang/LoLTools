@@ -394,7 +394,6 @@ void AccountManager::on_actionEnableReport_triggered(){
     scripts -> trigger(Script::type::Report);
 }
 
-
 void AccountManager::on_actionEnableInsert_triggered(){
     scripts -> trigger(Script::type::Select);
 }

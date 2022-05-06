@@ -9,6 +9,8 @@ Script::Script(){
 
     keyThread = QThread::create([this](){monitorKeys();});
     keyThread -> start();
+
+    champs.append("Draven");
 }
 
 void Script::genThread(type __type){
@@ -55,73 +57,72 @@ void Script::trigger(type __type){
     }
 }
 
+void Script::click(INPUT* key, cv::Point p){
+    SetCursorPos(p.x, p.y);
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+    SendInput(1, key, sizeof(INPUT));
+    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, key, sizeof(INPUT));
+}
+
+void Script::typeKeys(QString selectedChamp){
+    auto ip = new INPUT{};
+    ip->type = INPUT_KEYBOARD;
+    ip->ki.dwFlags = KEYEVENTF_UNICODE;
+    ip->ki.time = 0;
+    ip->ki.wVk = 0;
+    ip->ki.dwExtraInfo = 0;
+
+    for(char c : selectedChamp.toStdString()){
+        ip->ki.wScan = c;
+        SendInput(1, ip, sizeof(INPUT));
+    }
+    delete ip;
+}
+
 void Script::select(){
     cv::Point p, q;
-    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['S'] = false;
-
     bool banned = true;
+    auto key = new INPUT{};
+    int prioChamp = 0;
+    QString selectedChamp;
+
+    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['S'] = false;
+    key -> type = INPUT_MOUSE;
+
     while(!keys['S'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         p = processFrame(":/imgs/none.png");
         if(p != cv::Point{-1, -1}){
             p += cv::Point{25, 25};
-            SetCursorPos(p.x, p.y);
-
-            auto key = new INPUT{};
-            key -> type = INPUT_MOUSE;
-            key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-            SendInput(1, key, sizeof(INPUT));
-            key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-            SendInput(1, key, sizeof(INPUT));
+            click(key, p);
             banned = true;
-            delete key;
         }
 
         p = processFrame(":/imgs/ban.png");
         if(banned){
             if(p != cv::Point{-1, -1}){
                 p += cv::Point{100, 30};
-                SetCursorPos(p.x, p.y);
-
-                auto key = new INPUT{};
-                key -> type = INPUT_MOUSE;
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-                SendInput(1, key, sizeof(INPUT));
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-                SendInput(1, key, sizeof(INPUT));
-                delete key;
+                click(key, p);
             }
 
             p = processFrame(":/imgs/search.png");
             if(p != cv::Point{-1, -1}){
                 p += cv::Point{100, 10};
-                SetCursorPos(p.x, p.y);
+                click(key, p);
+                click(key, p);
 
-                auto key = new INPUT{};
-                key -> type = INPUT_MOUSE;
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-                SendInput(1, key, sizeof(INPUT));
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-                SendInput(1, key, sizeof(INPUT));
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-                SendInput(1, key, sizeof(INPUT));
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-                SendInput(1, key, sizeof(INPUT));
-                //type here
-                delete key;
+                if(prioChamp < champs.size()){
+                    selectedChamp = champs.at(prioChamp);
+                    typeKeys(selectedChamp);
+                    prioChamp += 1;
+                    click(key, p - cv::Point{450, -80});
+                }
             }
 
             p = processFrame(":/imgs/lock_in.png");
             if(p != cv::Point{-1, -1}){
                 p += cv::Point{100, 30};
-                SetCursorPos(p.x, p.y);
-
-                auto key = new INPUT{};
-                key -> type = INPUT_MOUSE;
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-                SendInput(1, key, sizeof(INPUT));
-                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-                SendInput(1, key, sizeof(INPUT));
-                delete key;
+                click(key, p);
             }
         }
 
@@ -130,35 +131,33 @@ void Script::select(){
         q = processFrame(":/imgs/in_queue.png");
         if(p != cv::Point{-1, -1} || q != cv::Point{-1, -1}){
             banned = false;
+            prioChamp = 0;
         }
         if(!enabledScripts[type::Select])
             break;
     }
     enabledScripts[type::Select] = false;
+    delete key;
 }
 
 void Script::accept(){
     cv::Point p;
+    auto key = new INPUT{};
+
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['A'] = false;
+    key -> type = INPUT_MOUSE;
 
     while(!keys['A'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         p = processFrame(":/imgs/accept.png");
         if(p != cv::Point{-1, -1}){
             p += cv::Point{100, 30};
-            SetCursorPos(p.x, p.y);
-
-            auto key = new INPUT{};
-            key -> type = INPUT_MOUSE;
-            key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-            SendInput(1, key, sizeof(INPUT));
-            key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-            SendInput(1, key, sizeof(INPUT));
-            delete key;
+            click(key, p);
         }
         if(!enabledScripts[type::Accept])
             break;
     }
     enabledScripts[type::Accept] = false;
+    delete key;
 }
 
 void Script::reportPlayer(cv::Point p){
@@ -168,42 +167,29 @@ void Script::reportPlayer(cv::Point p){
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel += p;
-    SetCursorPos(rel.x, rel.y);
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-    SendInput(1, key, sizeof(INPUT));
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-    SendInput(1, key, sizeof(INPUT));
+    click(key, rel);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel.y = p.y + 277;
-    SetCursorPos(rel.x, rel.y);
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-    SendInput(1, key, sizeof(INPUT));
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-    SendInput(1, key, sizeof(INPUT));
+    click(key, rel);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel.y = p.y + 353;
-    SetCursorPos(rel.x, rel.y);
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-    SendInput(1, key, sizeof(INPUT));
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-    SendInput(1, key, sizeof(INPUT));
+    click(key, rel);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     rel.y = p.y + 600;
     rel.x += 200;
-    SetCursorPos(rel.x, rel.y);
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-    SendInput(1, key, sizeof(INPUT));
-    key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
-    SendInput(1, key, sizeof(INPUT));
+    click(key, rel);
     delete key;
 }
 
 void Script::report(){
     cv::Point p, rel;
+    auto key = new INPUT{};
+
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['R'] = false;
+    key -> type = INPUT_MOUSE;
 
     bool pgl = false;
     while(!keys['R'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
@@ -216,14 +202,11 @@ void Script::report(){
                     rel.y + i*35 + (i > 3 ? 8 : 0)
                 );
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                auto key = new INPUT{};
-                key -> type = INPUT_MOUSE;
                 key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
                 SendInput(1, key, sizeof(INPUT));
                 key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
                 SendInput(1, key, sizeof(INPUT));
                 reportPlayer(p);
-                delete key;
             }
             pgl = true;
         }
@@ -234,6 +217,7 @@ void Script::report(){
             break;
     }
     enabledScripts[type::Report] = false;
+    delete key;
 }
 
 cv::Mat Script::QImageToMat(QImage image){

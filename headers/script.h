@@ -27,6 +27,7 @@ class Script{
             Report,
             Select
         };
+        QList<QString> champs;
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
@@ -37,6 +38,8 @@ class Script{
         cv::Mat captureScreenMat(HWND hwnd);
         BITMAPINFOHEADER createBitmapHeader(int width, int height);
 
+
+        void click(INPUT* key, cv::Point p);
         void exec(type script);
         void genThread(type __type);
 
@@ -44,7 +47,7 @@ class Script{
         void report();
         void reportPlayer(cv::Point p);
         void select();
-
+        void typeKeys(QString selectedChamp);
         void trigger(type __type);
 };
 
