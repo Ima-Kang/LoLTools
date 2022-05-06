@@ -116,7 +116,7 @@ void AccountManager::populateLayout(){
 
     auto list = accLayouts[tabName];
     for(auto& hbl : list){
-        //hbl->setParent(nullptr);
+        hbl->setParent(nullptr);
         addToLayout(tab, hbl);
     }
     updateRowNumber();
