@@ -10,7 +10,8 @@ Script::Script(){
     keyThread = QThread::create([this](){monitorKeys();});
     keyThread -> start();
 
-    champs.append("Draven");
+    //champs.append("Draven");
+    //champs.append("Nunu");
 }
 
 void Script::genThread(type __type){
@@ -115,7 +116,9 @@ void Script::select(){
                     selectedChamp = champs.at(prioChamp);
                     typeKeys(selectedChamp);
                     prioChamp += 1;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                     click(key, p - cv::Point{450, -80});
+                    std::this_thread::sleep_for(std::chrono::milliseconds(250));
                 }
             }
 
@@ -321,7 +324,7 @@ cv::Point Script::processFrame(QString object){
     }
 
     cv::Point minLoc, maxLoc, matchLoc;
-    double minVal, maxVal, threshold = (object == ":/imgs/pgl.png") ? 0.3 : 0.99;
+    double minVal, maxVal, threshold = (object == ":/imgs/pgl.png") ? 0.45 : 0.99;
 
     cv::matchTemplate(currentFrame, templ, result, cv::TM_CCOEFF_NORMED);
 
