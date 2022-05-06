@@ -8,6 +8,7 @@
 #include "removedialog.h"
 #include "script.h"
 #include "hotkey.h"
+#include "settings.h"
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -42,6 +43,8 @@ private slots:
     void on_actionEnableReport_triggered();
 
     void on_actionEnableInsert_triggered();
+
+    void on_actionSettings_4_triggered();
 
 private:
     Ui::AccountManager *ui;

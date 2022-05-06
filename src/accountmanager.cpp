@@ -398,3 +398,11 @@ void AccountManager::on_actionEnableInsert_triggered(){
     scripts -> trigger(Script::type::Select);
 }
 
+
+void AccountManager::on_actionSettings_4_triggered(){
+    Settings settings{nullptr};
+    settings.setModal(true);
+    if(settings.exec() == QDialog::DialogCode::Rejected)
+        return;
+}
+
