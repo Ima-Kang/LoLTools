@@ -242,6 +242,8 @@ void Script::report(){
         }
         p = processFrame(":/imgs/find_match.png");
         pgl &= p == cv::Point{-1,-1};
+        p = processFrame(":/imgs/in_queue.png");
+        pgl &= p == cv::Point{-1,-1};
 
         if(!enabledScripts[type::Report])
             break;
@@ -351,7 +353,14 @@ cv::Point Script::processFrame(QString object){
     }
 
     cv::Point minLoc, maxLoc, matchLoc;
-    double minVal, maxVal, threshold = (object == ":/imgs/pgl.png") ? 0.45 : 0.99;
+    double minVal, maxVal, threshold;
+
+    if(object == ":/imgs/pgl.png")
+        threshold = 0.45;
+    else if(object == ":/imgs/find_match.png")
+        threshold = 0.90;
+    else
+        threshold = 0.99;
 
     cv::matchTemplate(currentFrame, templ, result, cv::TM_CCOEFF_NORMED);
 
