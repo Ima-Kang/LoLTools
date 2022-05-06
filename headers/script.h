@@ -28,6 +28,7 @@ class Script{
             Select
         };
         QList<QString> champs;
+        QList<QString> banChamps;
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
