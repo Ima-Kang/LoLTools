@@ -387,11 +387,15 @@ void AccountManager::on_actionEdit_account_triggered(){
 }
 
 void AccountManager::on_actionEnableAccept_triggered(){
-    scripts -> acceptTrigger();
+    scripts -> trigger(Script::type::Accept);
 }
 
 void AccountManager::on_actionEnableReport_triggered(){
-    scripts -> reportTrigger();
-    //RegisterHotKey(NULL, 1, MOD_ALT | 0x4000, 0x42);
+    scripts -> trigger(Script::type::Report);
+}
+
+
+void AccountManager::on_actionEnableInsert_triggered(){
+    scripts -> trigger(Script::type::Select);
 }
 

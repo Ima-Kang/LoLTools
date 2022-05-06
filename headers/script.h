@@ -24,7 +24,8 @@ class Script{
     public:
         enum type{
             Accept,
-            Report
+            Report,
+            Select
         };
         bool enabled;
         QHash<int, QThread*> script;
@@ -40,10 +41,11 @@ class Script{
         void genThread(type __type);
 
         void accept();
-        void acceptTrigger();
         void report();
-        void reportTrigger();
         void reportPlayer(cv::Point p);
+        void select();
+
+        void trigger(type __type);
 };
 
 #endif // SCRIPT_H

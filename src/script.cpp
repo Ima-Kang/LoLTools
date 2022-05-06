@@ -11,44 +11,14 @@ Script::Script(){
     keyThread -> start();
 }
 
-void Script::acceptTrigger(){
-    auto accept = script[Script::type::Accept];
-    if(accept->isFinished()){
-        genThread(Script::type::Accept);
-    }
-
-    if(enabledScripts[Script::type::Accept]){
-        enabledScripts[Script::type::Accept] = false;
-        accept -> wait();
-    }
-    else if(!enabledScripts[Script::type::Accept]){
-        exec(Script::type::Accept);
-    }
-}
-
-void Script::reportTrigger(){
-    auto report = script[Script::type::Report];
-    if(report->isFinished()){
-        genThread(Script::type::Report);
-    }
-
-    if(enabledScripts[Script::type::Report]){
-        enabledScripts[Script::type::Report] = false;
-        report -> wait();
-        qDebug() << "STOP";
-    }
-    else if(!enabledScripts[Script::type::Report]){
-        qDebug() << "START";
-        exec(Script::type::Report);
-    }
-}
-
 void Script::genThread(type __type){
     switch(__type){
         case type::Accept:
             script[type::Accept] = QThread::create([this](){accept();});
         case type::Report:
             script[type::Report] = QThread::create([this](){report();});
+        case type::Select:
+            script[type::Select] = QThread::create([this](){select();});
         break;
     }
 }
@@ -57,6 +27,7 @@ void Script::monitorKeys(){
     while(true){
         keys['A'] = GetAsyncKeyState('A');
         keys['R'] = GetAsyncKeyState('R');
+        keys['S'] = GetAsyncKeyState('S');
         keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL);
         keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT);
     }
@@ -68,6 +39,104 @@ void Script::exec(type __script){
     enabledScripts[__script] = true;
     script[__script] -> start();
 }
+
+void Script::trigger(type __type){
+    auto trigger = script[__type];
+    if(trigger->isFinished()){
+        genThread(__type);
+    }
+
+    if(enabledScripts[__type]){
+        enabledScripts[__type] = false;
+        trigger -> wait();
+    }
+    else if(!enabledScripts[__type]){
+        exec(__type);
+    }
+}
+
+void Script::select(){
+    cv::Point p, q;
+    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['S'] = false;
+
+    bool banned = true;
+    while(!keys['S'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
+        p = processFrame(":/imgs/none.png");
+        if(p != cv::Point{-1, -1}){
+            p += cv::Point{25, 25};
+            SetCursorPos(p.x, p.y);
+
+            auto key = new INPUT{};
+            key -> type = INPUT_MOUSE;
+            key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+            SendInput(1, key, sizeof(INPUT));
+            key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+            SendInput(1, key, sizeof(INPUT));
+            banned = true;
+            delete key;
+        }
+
+        p = processFrame(":/imgs/ban.png");
+        if(banned){
+            if(p != cv::Point{-1, -1}){
+                p += cv::Point{100, 30};
+                SetCursorPos(p.x, p.y);
+
+                auto key = new INPUT{};
+                key -> type = INPUT_MOUSE;
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+                SendInput(1, key, sizeof(INPUT));
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                SendInput(1, key, sizeof(INPUT));
+                delete key;
+            }
+
+            p = processFrame(":/imgs/search.png");
+            if(p != cv::Point{-1, -1}){
+                p += cv::Point{100, 10};
+                SetCursorPos(p.x, p.y);
+
+                auto key = new INPUT{};
+                key -> type = INPUT_MOUSE;
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+                SendInput(1, key, sizeof(INPUT));
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                SendInput(1, key, sizeof(INPUT));
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+                SendInput(1, key, sizeof(INPUT));
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                SendInput(1, key, sizeof(INPUT));
+                //type here
+                delete key;
+            }
+
+            p = processFrame(":/imgs/lock_in.png");
+            if(p != cv::Point{-1, -1}){
+                p += cv::Point{100, 30};
+                SetCursorPos(p.x, p.y);
+
+                auto key = new INPUT{};
+                key -> type = INPUT_MOUSE;
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+                SendInput(1, key, sizeof(INPUT));
+                key -> mi.dwFlags = MOUSEEVENTF_LEFTUP;
+                SendInput(1, key, sizeof(INPUT));
+                delete key;
+            }
+        }
+
+        //  if player dodges
+        p = processFrame(":/imgs/accept.png");
+        q = processFrame(":/imgs/in_queue.png");
+        if(p != cv::Point{-1, -1} || q != cv::Point{-1, -1}){
+            banned = false;
+        }
+        if(!enabledScripts[type::Select])
+            break;
+    }
+    enabledScripts[type::Select] = false;
+}
+
 void Script::accept(){
     cv::Point p;
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['A'] = false;
@@ -136,9 +205,10 @@ void Script::report(){
     cv::Point p, rel;
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['R'] = false;
 
+    bool pgl = false;
     while(!keys['R'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         rel = p = processFrame(":/imgs/pgl.png");
-        if(p != cv::Point{-1,-1}){
+        if(p != cv::Point{-1,-1} && !pgl){
             rel += cv::Point{165, 156}; // +35
             for(int i = 0; i < 10; i++){
                 SetCursorPos(
@@ -155,8 +225,11 @@ void Script::report(){
                 reportPlayer(p);
                 delete key;
             }
-            break;
+            pgl = true;
         }
+        p = processFrame(":/imgs/find_match.png");
+        pgl &= p == cv::Point{-1,-1};
+
         if(!enabledScripts[type::Report])
             break;
     }

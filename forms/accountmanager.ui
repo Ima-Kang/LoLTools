@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -537,11 +537,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Page</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
     <item>
@@ -694,7 +689,7 @@
      <property name="title">
       <string>Auto Select</string>
      </property>
-     <addaction name="actionEnable_3"/>
+     <addaction name="actionEnableInsert"/>
      <addaction name="separator"/>
      <addaction name="actionSettings_4"/>
      <addaction name="separator"/>
@@ -761,7 +756,7 @@
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionEnable_3">
+  <action name="actionEnableInsert">
    <property name="text">
     <string>Enable</string>
    </property>

@@ -12,5 +12,7 @@
         <file>pgl.png</file>
         <file>report.png</file>
         <file>box.png</file>
+        <file>find_match.png</file>
+        <file>in_queue.png</file>
     </qresource>
 </RCC>
