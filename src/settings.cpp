@@ -28,29 +28,35 @@ void Settings::onRemove(){
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QString name = button->text();
 
-    champList.remove(champList.indexOf(name));
+    if(champList.indexOf(name) >= 0)
+        champList.remove(champList.indexOf(name));
+    else
+        banChampList.remove(banChampList.indexOf(name));
     delete button;
 }
 
 void Settings::onAddClicked(){
-    if(champList.size() >= 10)
-        return;
-
+    auto add = ui->comboBox->currentText() == "Add";
     QString champName = ui->name->text();
-    if(champList.indexOf(champName) >= 0 || champName == "")
+
+    if(champList.indexOf(champName) >= 0 || banChampList.indexOf(champName) >= 0)
+        return;
+    else if(champName == "")
         return;
 
-    QVBoxLayout* champLayoutList = ui->champList;
+    QVBoxLayout* champLayoutList = add ? ui->champList : ui->banChampList;
     QPushButton* nameButton = new QPushButton(champName);
     QObject::connect(
         nameButton, &QPushButton::clicked,
         this, &Settings::onRemove
     );
     //nameButton->setMaximumSize(QSize{250, 25});
-
-    champList.append(champName);
+    if(add)
+        champList.append(champName);
+    else
+        banChampList.append(champName);
     nameButton->setToolTip(QString{"Click to remove"});
-    //champLayoutList->addWidget(nameButton);
+
     champLayoutList->insertWidget(champLayoutList->count() - 1, nameButton);
     ui->name->setText("");
 }

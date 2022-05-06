@@ -21,6 +21,7 @@ public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings();
     QList<QString> champList;
+    QList<QString> banChampList;
 private:
     Ui::Settings *ui;
 };

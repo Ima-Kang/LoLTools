@@ -41,12 +41,12 @@
             <widget class="QComboBox" name="comboBox">
              <item>
               <property name="text">
-               <string>Add champ</string>
+               <string>Add</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Ban champ</string>
+               <string>Ban</string>
               </property>
              </item>
             </widget>
