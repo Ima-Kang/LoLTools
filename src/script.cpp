@@ -1,7 +1,8 @@
 #include "../headers/script.h"
 
 void monitorKeys(Script* s);
-Script::Script(){
+Script::Script(QList<QString>& __champs, QList<QString>& __banChamps):
+    champs{__champs}, banChamps{__banChamps}{
     enabled = bool{false};
 
     genThread(type::Accept);
@@ -9,12 +10,6 @@ Script::Script(){
 
     keyThread = QThread::create([this](){monitorKeys();});
     keyThread -> start();
-
-    banChamps.append("Samira");
-    banChamps.append("Akali");
-
-    champs.append("Draven");
-    champs.append("Nunu");
 }
 
 void Script::genThread(type __type){

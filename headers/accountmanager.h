@@ -22,6 +22,9 @@
 #include <QDir>
 #include <QClipboard>
 #include <QStyle>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -57,6 +60,9 @@ private:
     QHash<QString, QFrame*> mUserToLayoutMap;
     QHash<QString, QList<QFrame*>> accLayouts;
 
+    QList<QString> champs;
+    QList<QString> banChamps;
+
     QVBoxLayout* getCurrentLayout();
     void updateDetails();
     void generateAccountLayout(AccountInfo& acc);
@@ -70,5 +76,6 @@ private:
     void onButtonCopy();
     void updateRowNumber();
     void onStatusChange();
+    void loadSettings();
 };
 #endif // ACCOUNTMANAGER_H

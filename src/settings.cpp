@@ -1,8 +1,9 @@
 #include "../headers/settings.h"
 #include "ui_settings.h"
 
-Settings::Settings(QWidget *parent) :
-    QDialog(parent),
+Settings::Settings(
+    QWidget *parent, QList<QString>* __champs, QList<QString>* __banChamps
+) : QDialog(parent), champList{*__champs}, banChampList{*__banChamps},
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
@@ -14,6 +15,12 @@ Settings::Settings(QWidget *parent) :
     connect(applyButton, SIGNAL(clicked()), this, SLOT(apply()));
 
     connect(ui->Add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
+    for(auto& c : *__champs){
+        genChampButton(c, ui->champList);
+    }
+    for(auto& c : *__banChamps){
+        genChampButton(c, ui->banChampList);
+    }
 }
 
 Settings::~Settings(){
@@ -22,6 +29,17 @@ Settings::~Settings(){
 
 void Settings::apply(){
 
+}
+
+void Settings::genChampButton(QString champName, QVBoxLayout* layout){
+    QPushButton* nameButton = new QPushButton(champName);
+    QObject::connect(
+        nameButton, &QPushButton::clicked,
+        this, &Settings::onRemove
+    );
+    nameButton->setToolTip(QString{"Click to remove"});
+
+    layout->insertWidget(layout->count() - 1, nameButton);
 }
 
 void Settings::onRemove(){
