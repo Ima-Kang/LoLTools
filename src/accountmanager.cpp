@@ -277,7 +277,7 @@ void AccountManager::onStatusChange(){
 }
 
 void AccountManager::on_actionAdd_account_triggered(){
-    AddDialog addDialog;
+    AddDialog addDialog{this};
 
     addDialog.setModal(true);
     if(addDialog.exec() == QDialog::DialogCode::Rejected)
@@ -328,7 +328,7 @@ void AccountManager::remove_from_layouts(QString usr){
 };
 
 void AccountManager::on_actionRemove_account_triggered(){
-    RemoveDialog removeDialog{nullptr, &(accounts)};
+    RemoveDialog removeDialog{this, &(accounts)};
     removeDialog.setModal(true);
     if(removeDialog.exec() == QDialog::DialogCode::Rejected)
         return;
@@ -393,7 +393,7 @@ void AccountManager::updateDetails(){
 };
 
 void AccountManager::on_actionEdit_account_triggered(){
-    EditDialog editDialog{nullptr, &(accounts)};
+    EditDialog editDialog{this, &(accounts)};
     editDialog.setModal(true);
     if(editDialog.exec() == QDialog::DialogCode::Rejected)
         return;
@@ -446,11 +446,13 @@ void AccountManager::on_actionEnableInsert_triggered(){
     scripts -> trigger(Script::type::Select);
 }
 
-
 void AccountManager::on_actionSettings_4_triggered(){
-    Settings settings{nullptr, &champs, &banChamps};
+    Settings settings{this, &champs, &banChamps};
     settings.setModal(true);
     if(settings.exec() == QDialog::DialogCode::Rejected)
         return;
+    //  if ok/apply
+//    champs = settings.champList;
+//    banChamps = settings.banChampList;
 }
 
