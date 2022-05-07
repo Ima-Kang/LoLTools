@@ -45,6 +45,8 @@ void Settings::removeRole(){
 
     if(i > 0)
         currentProfile = profiles.at(i - 1);
+    else if(profiles.size() > 0)
+        currentProfile = profiles.at(i + 1);
     else{
         delete currentProfile;
         currentProfile = new Profile{};
