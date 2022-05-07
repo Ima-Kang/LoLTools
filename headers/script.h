@@ -27,12 +27,13 @@ class Script{
             Report,
             Select
         };
-        QList<QString> champs;
+        QList<QString>& champs;
+        QList<QString>& banChamps;
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
 
-        Script();
+        Script(QList<QString>&, QList<QString>&);
         cv::Point processFrame(QString object);
         cv::Mat QImageToMat(QImage image);
         cv::Mat captureScreenMat(HWND hwnd);

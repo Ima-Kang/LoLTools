@@ -21,6 +21,7 @@ SOURCES += \
     src/removedialog.cpp \
     src/script.cpp \
     src/hotkey.cpp \
+    src/settings.cpp \
 
 HEADERS += \
     headers/accountinfo.h \
@@ -30,12 +31,14 @@ HEADERS += \
     headers/removedialog.h \
     headers/script.h \
     headers/hotkey.h \
+    headers/settings.h \
 
 FORMS += \
     forms/accountmanager.ui \
     forms/adddialog.ui \
     forms/editdialog.ui \
-    forms/removedialog.ui
+    forms/removedialog.ui \
+    forms/settings.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

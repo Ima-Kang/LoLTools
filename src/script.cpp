@@ -1,7 +1,8 @@
 #include "../headers/script.h"
 
 void monitorKeys(Script* s);
-Script::Script(){
+Script::Script(QList<QString>& __champs, QList<QString>& __banChamps):
+    champs{__champs}, banChamps{__banChamps}{
     enabled = bool{false};
 
     genThread(type::Accept);
@@ -9,9 +10,6 @@ Script::Script(){
 
     keyThread = QThread::create([this](){monitorKeys();});
     keyThread -> start();
-
-    //champs.append("Draven");
-    //champs.append("Nunu");
 }
 
 void Script::genThread(type __type){
@@ -83,29 +81,53 @@ void Script::typeKeys(QString selectedChamp){
 
 void Script::select(){
     cv::Point p, q;
-    bool banned = true;
+    bool banned = false, first = true;
     auto key = new INPUT{};
-    int prioChamp = 0;
+    int prioChamp = 0, prioBanChamp = 0;
     QString selectedChamp;
 
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['S'] = false;
     key -> type = INPUT_MOUSE;
 
     while(!keys['S'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
-        p = processFrame(":/imgs/none.png");
-        if(p != cv::Point{-1, -1}){
-            p += cv::Point{25, 25};
-            click(key, p);
-            banned = true;
+//        p = processFrame(":/imgs/none.png");
+//        if(p != cv::Point{-1, -1}){
+//            p += cv::Point{25, 25};
+//            click(key, p);
+//            banned = true;
+//        }
+
+        //  banning
+        if(!banned){
+            p = processFrame(":/imgs/search.png");
+            if(p != cv::Point{-1, -1} && first){
+                std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+                first = false;
+            }
+            if(p != cv::Point{-1, -1} && !first){
+                p += cv::Point{100, 10};
+                click(key, p);
+                click(key, p);
+
+                if(prioBanChamp < banChamps.size()){
+                    typeKeys(banChamps.at(prioBanChamp));
+                    prioBanChamp += 1;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    click(key, p - cv::Point{450, -80});
+                    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+                }
+
+                p = processFrame(":/imgs/ban.png");
+                if(p != cv::Point{-1, -1}){
+                    p += cv::Point{100, 30};
+                    click(key, p);
+                    banned = true;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+                }
+            }
         }
 
-        p = processFrame(":/imgs/ban.png");
         if(banned){
-            if(p != cv::Point{-1, -1}){
-                p += cv::Point{100, 30};
-                click(key, p);
-            }
-
             p = processFrame(":/imgs/search.png");
             if(p != cv::Point{-1, -1}){
                 p += cv::Point{100, 10};
@@ -113,8 +135,7 @@ void Script::select(){
                 click(key, p);
 
                 if(prioChamp < champs.size()){
-                    selectedChamp = champs.at(prioChamp);
-                    typeKeys(selectedChamp);
+                    typeKeys(champs.at(prioChamp));
                     prioChamp += 1;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                     click(key, p - cv::Point{450, -80});
@@ -134,7 +155,8 @@ void Script::select(){
         q = processFrame(":/imgs/in_queue.png");
         if(p != cv::Point{-1, -1} || q != cv::Point{-1, -1}){
             banned = false;
-            prioChamp = 0;
+            first = true;
+            prioChamp = prioBanChamp = 0;
         }
         if(!enabledScripts[type::Select])
             break;
@@ -214,6 +236,8 @@ void Script::report(){
             pgl = true;
         }
         p = processFrame(":/imgs/find_match.png");
+        pgl &= p == cv::Point{-1,-1};
+        p = processFrame(":/imgs/in_queue.png");
         pgl &= p == cv::Point{-1,-1};
 
         if(!enabledScripts[type::Report])
@@ -324,7 +348,14 @@ cv::Point Script::processFrame(QString object){
     }
 
     cv::Point minLoc, maxLoc, matchLoc;
-    double minVal, maxVal, threshold = (object == ":/imgs/pgl.png") ? 0.45 : 0.99;
+    double minVal, maxVal, threshold;
+
+    if(object == ":/imgs/pgl.png")
+        threshold = 0.45;
+    else if(object == ":/imgs/find_match.png")
+        threshold = 0.90;
+    else
+        threshold = 0.99;
 
     cv::matchTemplate(currentFrame, templ, result, cv::TM_CCOEFF_NORMED);
 

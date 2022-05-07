@@ -8,6 +8,7 @@
 #include "removedialog.h"
 #include "script.h"
 #include "hotkey.h"
+#include "settings.h"
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -21,6 +22,9 @@
 #include <QDir>
 #include <QClipboard>
 #include <QStyle>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AccountManager; }
@@ -43,6 +47,8 @@ private slots:
 
     void on_actionEnableInsert_triggered();
 
+    void on_actionSettings_4_triggered();
+
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;
@@ -53,6 +59,9 @@ private:
     QHash<int, bool> keysPressed;
     QHash<QString, QFrame*> mUserToLayoutMap;
     QHash<QString, QList<QFrame*>> accLayouts;
+
+    QList<QString> champs;
+    QList<QString> banChamps;
 
     QVBoxLayout* getCurrentLayout();
     void updateDetails();
@@ -67,5 +76,6 @@ private:
     void onButtonCopy();
     void updateRowNumber();
     void onStatusChange();
+    void loadSettings();
 };
 #endif // ACCOUNTMANAGER_H
