@@ -18,15 +18,17 @@ private slots:
     void apply();
     void onAddClicked();
     void onRemove();
+    void selected();
     void onNewProfileClicked();
 public:
-   QList<Profile>& profiles;
-   Profile& currentProfile;
+   QList<Profile*>& profiles;
+   Profile* currentProfile;
 
     explicit Settings(QWidget *parent = nullptr,
-        QList<Profile>* = nullptr,  Profile* = nullptr);
+        QList<Profile*>* = nullptr,  Profile* = nullptr);
     ~Settings();
     void genChampButton(QString champ, QVBoxLayout* layout);
+    void clearLayouts();
 private:
     Ui::Settings *ui;
 };

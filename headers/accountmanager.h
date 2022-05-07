@@ -63,7 +63,7 @@ private:
 
     QList<QString> champs;
     QList<QString> banChamps;
-    QList<Profile> profiles;
+    QList<Profile*> profiles;
     Profile currentProfile;
 
     QVBoxLayout* getCurrentLayout();

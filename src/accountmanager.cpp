@@ -73,9 +73,9 @@ void AccountManager::saveSettings(){
     json["currentProfile"] = currentProfileObject;
 
     QJsonArray profilesArray;
-    foreach(Profile p, profiles){
+    foreach(Profile* p, profiles){
         QJsonObject profileObject;
-        p.write(profileObject);
+        p->write(profileObject);
         profilesArray.append(profileObject);
     }
     json["profiles"] = profilesArray;
@@ -107,8 +107,8 @@ void AccountManager::loadSettings(){
     QJsonArray profilesArray = json["profiles"].toArray();
     for(int i = 0; i < profilesArray.size(); i++){
         QJsonObject profileObject = profilesArray[i].toObject();
-        Profile p;
-        p.read(profileObject);
+        auto p = new Profile{};
+        p->read(profileObject);
         profiles.append(p);
     }
 
@@ -456,6 +456,7 @@ void AccountManager::on_actionSettings_4_triggered(){
     settings.setModal(true);
     if(settings.exec() == QDialog::DialogCode::Rejected)
         return;
+    currentProfile = *settings.currentProfile;
     //  if ok/apply
 //    champs = settings.champList;
 //    banChamps = settings.banChampList;
