@@ -20,6 +20,7 @@ private slots:
     void onRemove();
     void selected();
     void onNewProfileClicked();
+    void removeRole();
 public:
    QList<Profile*>& profiles;
    Profile* currentProfile;

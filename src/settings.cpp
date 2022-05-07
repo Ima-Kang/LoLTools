@@ -18,19 +18,47 @@ Settings::Settings(
 
     connect(ui->Add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
     connect(ui->newProfile, SIGNAL(clicked()), this, SLOT(onNewProfileClicked()));
+    connect(ui->removeRole, SIGNAL(clicked()), this, SLOT(removeRole()));
 
-    if(__currentProfile->profileName->isEmpty())
+    if(__currentProfile->profileName->isEmpty() || !__currentProfile)
         ui->removeWidget->setVisible(false);
     else{
-        for(auto& c : *__currentProfile->champs)
+        for(const auto& c : *__currentProfile->champs)
             genChampButton(c, ui->champList);
-        for(auto& c : *__currentProfile->banChamps)
+        for(const auto& c : *__currentProfile->banChamps)
             genChampButton(c, ui->banChampList);
-        for(auto& p: *__profiles)
+        for(const auto& p: *__profiles)
             ui->profileBox->insertItem(0, *p->profileName);
         ui->profileBox->setCurrentText(*__currentProfile->profileName);
         ui->profileLabel->setText(*__currentProfile->profileName);
     }
+}
+
+void Settings::removeRole(){
+    if(currentProfile->profileName->isEmpty())
+        return;
+
+    auto i = profiles.indexOf(currentProfile);
+    ui->profileBox->removeItem(ui->profileBox->currentIndex());
+    profiles.remove(i);
+    clearLayouts();
+
+    if(i > 0)
+        currentProfile = profiles.at(i - 1);
+    else{
+        delete currentProfile;
+        currentProfile = new Profile{};
+        ui->removeWidget->setVisible(false);
+        return;
+    }
+
+    ui->profileLabel->setText(*currentProfile->profileName);
+    ui->profileBox->setCurrentText(*currentProfile->profileName);
+
+    for(auto& champ : *currentProfile->champs)
+        genChampButton(champ, ui->champList);
+    for(auto& champ : *currentProfile->banChamps)
+        genChampButton(champ, ui->banChampList);
 }
 
 void Settings::selected(){
