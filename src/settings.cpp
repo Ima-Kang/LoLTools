@@ -15,12 +15,14 @@ Settings::Settings(
     connect(applyButton, SIGNAL(clicked()), this, SLOT(apply()));
 
     connect(ui->Add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
-    for(auto& c : *__currentProfile->champs){
+    connect(ui->newProfile, SIGNAL(clicked()), this, SLOT(onNewProfileClicked()));
+
+    for(auto& c : *__currentProfile->champs)
         genChampButton(c, ui->champList);
-    }
-    for(auto& c : *__currentProfile->banChamps){
+    for(auto& c : *__currentProfile->banChamps)
         genChampButton(c, ui->banChampList);
-    }
+    for(auto& p: *__profiles)
+        ui->profileBox->insertItem(0, *p.profileName);
 }
 
 Settings::~Settings(){
@@ -80,4 +82,12 @@ void Settings::onAddClicked(){
     ui->name->setText("");
 }
 
-
+void Settings::onNewProfileClicked(){
+    for(auto& p : profiles)
+        if(ui->profileName->text() == *p.profileName)
+            return;
+    *currentProfile.profileName = ui->profileName->text();
+    Profile newProfile{currentProfile};
+    profiles.append(newProfile);
+    ui->profileBox->insertItem(0, *newProfile.profileName);
+}

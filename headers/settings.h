@@ -18,6 +18,7 @@ private slots:
     void apply();
     void onAddClicked();
     void onRemove();
+    void onNewProfileClicked();
 public:
    QList<Profile>& profiles;
    Profile& currentProfile;

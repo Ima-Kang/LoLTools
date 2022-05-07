@@ -36,9 +36,70 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4,0">
+           <item>
+            <widget class="QComboBox" name="profileBox">
+             <property name="maximumSize">
+              <size>
+               <width>250</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="baseSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Arial</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="maxVisibleItems">
+              <number>10</number>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+             <property name="placeholderText">
+              <string>Profile</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="profileName">
+             <property name="font">
+              <font>
+               <family>Arial</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
+             <property name="placeholderText">
+              <string>Profile name</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="newProfile">
+             <property name="text">
+              <string>New Profile</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4,0">
            <item>
             <widget class="QComboBox" name="comboBox">
+             <property name="font">
+              <font>
+               <family>Arial</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <item>
               <property name="text">
                <string>Add</string>
@@ -49,13 +110,6 @@
                <string>Ban</string>
               </property>
              </item>
-            </widget>
-           </item>
-           <item>
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
             </widget>
            </item>
            <item>
@@ -73,18 +127,6 @@
            </item>
            <item>
             <widget class="QPushButton" name="Add">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>50</width>
-               <height>16777215</height>
-              </size>
-             </property>
              <property name="text">
               <string>Submit</string>
              </property>
@@ -129,7 +171,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>326</width>
-                <height>347</height>
+                <height>312</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -164,7 +206,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>325</width>
-                <height>347</height>
+                <height>312</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">

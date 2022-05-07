@@ -33,5 +33,4 @@ void Profile::write(QJsonObject &json){
     json["champs"] = champArray;
     json["banChamps"] = banChampArray;
     json["profileName"] = *profileName;
-    qDebug() << json.size();
 }
