@@ -2,8 +2,8 @@
 #include "ui_settings.h"
 
 Settings::Settings(
-    QWidget *parent, QList<QString>* __champs, QList<QString>* __banChamps
-) : QDialog(parent), champList{*__champs}, banChampList{*__banChamps},
+    QWidget *parent, QList<Profile>* __profiles, Profile* __currentProfile) :
+    profiles{*__profiles}, currentProfile{*__currentProfile},
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
@@ -15,10 +15,10 @@ Settings::Settings(
     connect(applyButton, SIGNAL(clicked()), this, SLOT(apply()));
 
     connect(ui->Add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
-    for(auto& c : *__champs){
+    for(auto& c : *__currentProfile->champs){
         genChampButton(c, ui->champList);
     }
-    for(auto& c : *__banChamps){
+    for(auto& c : *__currentProfile->banChamps){
         genChampButton(c, ui->banChampList);
     }
 }
@@ -46,10 +46,10 @@ void Settings::onRemove(){
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QString name = button->text();
 
-    if(champList.indexOf(name) >= 0)
-        champList.remove(champList.indexOf(name));
+    if(currentProfile.champs->indexOf(name) >= 0)
+        currentProfile.champs->remove(currentProfile.champs->indexOf(name));
     else
-        banChampList.remove(banChampList.indexOf(name));
+        currentProfile.banChamps->remove(currentProfile.banChamps->indexOf(name));
     delete button;
 }
 
@@ -57,7 +57,8 @@ void Settings::onAddClicked(){
     auto add = ui->comboBox->currentText() == "Add";
     QString champName = ui->name->text();
 
-    if(champList.indexOf(champName) >= 0 || banChampList.indexOf(champName) >= 0)
+    if(currentProfile.champs->indexOf(champName) >= 0 ||
+        currentProfile.banChamps->indexOf(champName) >= 0)
         return;
     else if(champName == "")
         return;
@@ -70,9 +71,9 @@ void Settings::onAddClicked(){
     );
     //nameButton->setMaximumSize(QSize{250, 25});
     if(add)
-        champList.append(champName);
+        currentProfile.champs->append(champName);
     else
-        banChampList.append(champName);
+        currentProfile.banChamps->append(champName);
     nameButton->setToolTip(QString{"Click to remove"});
 
     champLayoutList->insertWidget(champLayoutList->count() - 1, nameButton);

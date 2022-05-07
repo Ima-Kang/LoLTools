@@ -9,6 +9,7 @@
 #include "script.h"
 #include "hotkey.h"
 #include "settings.h"
+#include "profile.h"
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -62,6 +63,8 @@ private:
 
     QList<QString> champs;
     QList<QString> banChamps;
+    QList<Profile> profiles;
+    Profile currentProfile;
 
     QVBoxLayout* getCurrentLayout();
     void updateDetails();
@@ -77,5 +80,6 @@ private:
     void updateRowNumber();
     void onStatusChange();
     void loadSettings();
+    void saveSettings();
 };
 #endif // ACCOUNTMANAGER_H

@@ -1,8 +1,7 @@
 #include "../headers/script.h"
 
 void monitorKeys(Script* s);
-Script::Script(QList<QString>& __champs, QList<QString>& __banChamps):
-    champs{__champs}, banChamps{__banChamps}{
+Script::Script(Profile& __profile): profile{__profile}{
     enabled = bool{false};
 
     genThread(type::Accept);
@@ -109,8 +108,8 @@ void Script::select(){
                 click(key, p);
                 click(key, p);
 
-                if(prioBanChamp < banChamps.size()){
-                    typeKeys(banChamps.at(prioBanChamp));
+                if(prioBanChamp < profile.banChamps->size()){
+                    typeKeys(profile.banChamps->at(prioBanChamp));
                     prioBanChamp += 1;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                     click(key, p - cv::Point{450, -80});
@@ -134,8 +133,8 @@ void Script::select(){
                 click(key, p);
                 click(key, p);
 
-                if(prioChamp < champs.size()){
-                    typeKeys(champs.at(prioChamp));
+                if(prioChamp < profile.champs->size()){
+                    typeKeys(profile.champs->at(prioChamp));
                     prioChamp += 1;
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                     click(key, p - cv::Point{450, -80});

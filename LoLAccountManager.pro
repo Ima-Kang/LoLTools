@@ -18,6 +18,7 @@ SOURCES += \
     src/editdialog.cpp \
     src/main.cpp \
     src/accountmanager.cpp \
+    src/profile.cpp \
     src/removedialog.cpp \
     src/script.cpp \
     src/hotkey.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     headers/script.h \
     headers/hotkey.h \
     headers/settings.h \
+    headers/profile.h
 
 FORMS += \
     forms/accountmanager.ui \

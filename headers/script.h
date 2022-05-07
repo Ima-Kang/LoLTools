@@ -15,6 +15,8 @@
 #include <QHash>
 #include <functional>
 
+#include "profile.h"
+
 class Script{
     private:
         QHash<int, bool> keys;
@@ -27,13 +29,12 @@ class Script{
             Report,
             Select
         };
-        QList<QString>& champs;
-        QList<QString>& banChamps;
+        Profile& profile;
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
 
-        Script(QList<QString>&, QList<QString>&);
+        Script(Profile& __profile);
         cv::Point processFrame(QString object);
         cv::Mat QImageToMat(QImage image);
         cv::Mat captureScreenMat(HWND hwnd);

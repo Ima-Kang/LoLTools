@@ -1,7 +1,8 @@
 #include "../headers/accountmanager.h"
 
 AccountManager::AccountManager(QWidget *parent):
-        QMainWindow(parent), ui(new Ui::AccountManager){
+    QMainWindow(parent), ui(new Ui::AccountManager)
+{
     ui->setupUi(this);
     setFixedSize(width(), height());
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
@@ -11,9 +12,8 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Temp"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
 
-
     loadSettings();
-    scripts = new Script{champs, banChamps};
+    scripts = new Script{currentProfile};
     hotkeyA = new Hotkey();
     hotkeyR = new Hotkey();
 
@@ -46,31 +46,6 @@ void AccountManager::loadAccounts(){
     file.close();
 }
 
-void AccountManager::loadSettings(){
-    QFile loadFile(QStringLiteral("settings.json"));
-    if (!loadFile.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't load.");
-        return;
-    }
-
-    QByteArray saveData = loadFile.readAll();
-    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
-    QJsonObject json = loadDoc.object();
-
-    QJsonArray champList = json["champs"].toArray();
-    QJsonArray banChampList = json["banChamps"].toArray();
-
-    for(int i = 0; i < champList.size(); i++){
-        QString champ = champList[i].toString();
-        champs.append(champ);
-    }
-    for(int i = 0; i < banChampList.size(); i++){
-        QString champ = banChampList[i].toString();
-        banChamps.append(champ);
-    }
-    loadFile.close();
-}
-
 void AccountManager::closeEvent(QCloseEvent *bar){
     QFile file(QDir::currentPath().append("/.accounts"));
     if(!file.open(QFile::WriteOnly | QFile::Text)){
@@ -84,19 +59,26 @@ void AccountManager::closeEvent(QCloseEvent *bar){
     for(auto& acc : accounts){
         out << acc;
     }
+
     file.close();
+    saveSettings();
+    bar->accept();
+}
 
-
+void AccountManager::saveSettings(){
     QJsonObject json;
-    QJsonArray champList, banChampList;
-    foreach(const QString champ, champs){
-        champList.append(champ);
+    QJsonObject currentProfileObject;
+
+    currentProfile.write(currentProfileObject);
+    json["currentProfile"] = currentProfileObject;
+
+    QJsonArray profilesArray;
+    foreach(Profile p, profiles){
+        QJsonObject profileObject;
+        p.write(profileObject);
+        profilesArray.append(profileObject);
     }
-    foreach(const QString champ, banChamps){
-        banChampList.append(champ);
-    }
-    json["champs"] = champList;
-    json["banChamps"] = banChampList;
+    json["profiles"] = profilesArray;
 
     QFile saveFile(QStringLiteral("settings.json"));
     if (!saveFile.open(QIODevice::WriteOnly)) {
@@ -106,8 +88,31 @@ void AccountManager::closeEvent(QCloseEvent *bar){
     QJsonDocument saveDoc{json};
     saveFile.write(saveDoc.toJson());
     saveFile.close();
+}
 
-    bar->accept();
+void AccountManager::loadSettings(){
+    QFile loadFile(QStringLiteral("settings.json"));
+    if (!loadFile.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't load.");
+        return;
+    }
+
+    QByteArray saveData = loadFile.readAll();
+    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+    QJsonObject json = loadDoc.object();
+
+    QJsonObject currentProfileObject = json["currentProfile"].toObject();
+    currentProfile.read(currentProfileObject);
+
+    QJsonArray profilesArray = json["profiles"].toArray();
+    for(int i = 0; i < profilesArray.size(); i++){
+        QJsonObject profileObject = profilesArray[i].toObject();
+        Profile p;
+        p.read(profileObject);
+        profiles.append(p);
+    }
+
+    loadFile.close();
 }
 
 void AccountManager::keyPressEvent(QKeyEvent* event){
@@ -447,7 +452,7 @@ void AccountManager::on_actionEnableInsert_triggered(){
 }
 
 void AccountManager::on_actionSettings_4_triggered(){
-    Settings settings{this, &champs, &banChamps};
+    Settings settings{this, &profiles, &currentProfile};
     settings.setModal(true);
     if(settings.exec() == QDialog::DialogCode::Rejected)
         return;

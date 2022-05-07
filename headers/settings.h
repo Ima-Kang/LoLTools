@@ -5,6 +5,7 @@
 #include <QAbstractItemView>
 #include <QAbstractButton>
 #include <QLayout>
+#include "profile.h"
 
 namespace Ui {
 class Settings;
@@ -18,13 +19,13 @@ private slots:
     void onAddClicked();
     void onRemove();
 public:
-    QList<QString>& champList;
-    QList<QString>& banChampList;
+   QList<Profile>& profiles;
+   Profile& currentProfile;
+
     explicit Settings(QWidget *parent = nullptr,
-        QList<QString>* = nullptr, QList<QString>* = nullptr);
+        QList<Profile>* = nullptr,  Profile* = nullptr);
     ~Settings();
     void genChampButton(QString champ, QVBoxLayout* layout);
-
 private:
     Ui::Settings *ui;
 };
