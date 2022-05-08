@@ -216,28 +216,35 @@ void Script::report(){
         rel = p = processFrame(":/imgs/pgl.png");
         if(p != cv::Point{-1,-1} && !pgl){
             // get player names
-//            cv::Mat grayFrame, currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
-
-//            cv::cvtColor(currentFrame, grayFrame, cv::COLOR_BGR2GRAY);
-//            cv::threshold(grayFrame, grayFrame, 50, 255, cv::THRESH_BINARY);
-//            cv::bitwise_not(grayFrame, grayFrame);
-
+            QMutex mu;
             cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
-            rel += cv::Point{105, 118};
-            for(int i = 0; i < 11; i++){
-                //  process player name
-                if(i == 5){
+            QHash<QString, int> names;
+
+            rel += cv::Point{105, 153};
+            //  process every player name
+            for(int i = 0; i < 10; i++){
+                if(i == 4){
                     rel += cv::Point{0, 43};
                     continue;
                 }
-                QString name = getTextFromFrame(rel, currentFrame);
-                qDebug() << name;
+                QThread::create([this, &names, &mu]
+                    (cv::Point q, cv::Mat frame, int i){
+                    QString name{getTextFromFrame(q, frame)}; name.chop(1);
+                    mu.tryLock(); names[name] = i; mu.unlock();
+                }, rel, currentFrame, i) -> start();
+
                 rel += cv::Point{0, 35};
+            }
+            while(names.size() < 9);   //  wait until names are all determined
+
+            for(auto& name : whitelist){
+                if(names.contains(name))
+                    names.remove(name);
             }
 
             //  set rel loc for report buttons
             rel = p + cv::Point{165, 156}; // first report loc
-            for(int i = 0; i < 10; i++){
+            for(auto i : names.values()){
                 SetCursorPos(
                     rel.x,
                     rel.y + i*35 + (i > 3 ? 8 : 0)
@@ -385,7 +392,6 @@ cv::Point Script::processFrame(QString object){
 
 QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
     int multiplier = 2 + depth;
-    qDebug() << depth;
     if(currentFrame.empty())
         return "";
     cv::Size size{135, 20};
@@ -400,7 +406,7 @@ QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 
     //  Include training data
-    api->Init("./", "eng", tesseract::OEM_LSTM_ONLY);
+    api->Init("./", "eng_fast", tesseract::OEM_LSTM_ONLY);
     api->SetPageSegMode(tesseract::PSM_AUTO);
     api->SetImage(croppedImage.data, croppedImage.cols,
         croppedImage.rows, 4, croppedImage.step
@@ -420,6 +426,5 @@ QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
 //    cv::moveWindow("test", 100, 100);
 //    cv::imshow("test", croppedImage);
 //    cv::waitKey();
-
     return text;
 }

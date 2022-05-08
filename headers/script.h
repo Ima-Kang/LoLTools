@@ -18,7 +18,7 @@
 #include <chrono>
 #include <QHash>
 #include <functional>
-
+#include <QMutex>
 class Script{
     private:
         QHash<int, bool> keys;
@@ -35,6 +35,7 @@ class Script{
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
+        QList<QString> whitelist;
 
         Script(Profile& __profile);
         cv::Point processFrame(QString object);
