@@ -1,9 +1,13 @@
 #ifndef SCRIPT_H
 #define SCRIPT_H
 
+#include "profile.h"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
+#include "tesseract/baseapi.h"
+#include "leptonica/allheaders.h"
+#include <opencv2/photo.hpp>
 
 #include <Windows.h>
 #include <QString>
@@ -14,8 +18,6 @@
 #include <chrono>
 #include <QHash>
 #include <functional>
-
-#include "profile.h"
 
 class Script{
     private:
@@ -51,7 +53,7 @@ class Script{
         void select();
         void typeKeys(QString selectedChamp);
         void trigger(type __type);
-        QString getTextFromFrame(cv::Point p);
+        QString getTextFromFrame(cv::Point p, cv::Mat);
 };
 
 #endif // SCRIPT_H

@@ -59,3 +59,10 @@ INCLUDEPATH += $$PWD/../../../../../opencv-4.5.4/opencv/build/include
 DEPENDPATH += $$PWD/../../../../../opencv-4.5.4/opencv/build/include
 
 win32: LIBS += -lGdi32
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../vcpkg/installed/x64-windows/lib/ -ltesseract41
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../vcpkg/installed/x64-windows/lib/ -ltesseract41d
+else:unix: LIBS += -L$$PWD/../../../../../vcpkg/installed/x64-windows/lib/ -ltesseract41
+
+INCLUDEPATH += $$PWD/../../../../../vcpkg/installed/x64-windows/include
+DEPENDPATH += $$PWD/../../../../../vcpkg/installed/x64-windows/include

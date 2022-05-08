@@ -9,6 +9,10 @@ Script::Script(Profile& __profile): profile{__profile}{
 
     keyThread = QThread::create([this](){monitorKeys();});
     keyThread -> start();
+
+    //processFrame(":/imgs/accept.png");
+//    auto f = captureScreenMat(HWND{GetDesktopWindow()});
+//    getTextFromFrame(cv::Point{}, f);
 }
 
 void Script::genThread(type __type){
@@ -83,19 +87,11 @@ void Script::select(){
     bool banned = false, first = true;
     auto key = new INPUT{};
     int prioChamp = 0, prioBanChamp = 0;
-    QString selectedChamp;
 
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['S'] = false;
     key -> type = INPUT_MOUSE;
 
     while(!keys['S'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
-//        p = processFrame(":/imgs/none.png");
-//        if(p != cv::Point{-1, -1}){
-//            p += cv::Point{25, 25};
-//            click(key, p);
-//            banned = true;
-//        }
-
         //  banning
         if(!banned){
             p = processFrame(":/imgs/search.png");
@@ -220,14 +216,21 @@ void Script::report(){
         rel = p = processFrame(":/imgs/pgl.png");
         if(p != cv::Point{-1,-1} && !pgl){
             // get player names
-            rel += cv::Point{105, 120};
-            for(int i = 0; i < 10; i++){
+//            cv::Mat grayFrame, currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
+
+//            cv::cvtColor(currentFrame, grayFrame, cv::COLOR_BGR2GRAY);
+//            cv::threshold(grayFrame, grayFrame, 50, 255, cv::THRESH_BINARY);
+//            cv::bitwise_not(grayFrame, grayFrame);
+            cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
+            rel += cv::Point{105, 118};
+            for(int i = 0; i < 11; i++){
                 //  process player name
-                QString name = getTextFromFrame(rel);
-                if(i == 4){
-                    rel += cv::Point{0, 8};
+                if(i == 5){
+                    rel += cv::Point{0, 43};
                     continue;
                 }
+                QString name = getTextFromFrame(rel, currentFrame);
+                qDebug() << name;
                 rel += cv::Point{0, 35};
             }
 
@@ -379,9 +382,31 @@ cv::Point Script::processFrame(QString object){
     return maxVal >= threshold ? matchLoc : cv::Point{-1, -1};
 }
 
-QString Script::getTextFromFrame(cv::Point p){
-    cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
+QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame){
+    if(currentFrame.empty())
+        return "";
+    cv::Size size{135, 20};
+    cv::Mat croppedImage = currentFrame(cv::Rect{p.x, p.y, size.width, size.height});// +105x, +120y
+    cv::resize(croppedImage, croppedImage,
+        cv::Size(size.width*2, size.height*2), cv::INTER_LINEAR
+    );
 
-    cv::Mat croppedImage = currentFrame(cv::Rect{p.x, p.y, 135, 20});// +105x, +120y
+    tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 
+    //  Include training data
+    api->Init("./", "eng", tesseract::OEM_LSTM_ONLY);
+    api->SetPageSegMode(tesseract::PSM_AUTO);
+    api->SetImage(croppedImage.data, croppedImage.cols, croppedImage.rows, 4, croppedImage.step);
+    api->SetSourceResolution(92);
+    auto text = QString{api->GetUTF8Text()};
+
+    api->End();
+    delete api;
+
+    cv::namedWindow("test");
+    cv::moveWindow("test", 100, 100);
+    cv::imshow("test", croppedImage);
+    cv::waitKey();
+
+    return text;
 }
