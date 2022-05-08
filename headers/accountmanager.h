@@ -61,10 +61,11 @@ private:
     QHash<QString, QFrame*> mUserToLayoutMap;
     QHash<QString, QList<QFrame*>> accLayouts;
 
-    QList<QString> champs;
-    QList<QString> banChamps;
-    QList<Profile*> profiles;
-    Profile currentProfile;
+//    QList<QString> champs;
+//    QList<QString> banChamps;
+//    QList<Profile*> profiles;
+//    Profile currentProfile;
+    Settings* settings;
 
     QVBoxLayout* getCurrentLayout();
     void updateDetails();

@@ -1,9 +1,8 @@
 #include "../headers/settings.h"
 #include "ui_settings.h"
 
-Settings::Settings(
-    QWidget *parent, QList<Profile*>* __profiles, Profile* __currentProfile) :
-    profiles{*__profiles}, currentProfile{__currentProfile},
+Settings::Settings(QWidget *parent) :
+    profiles{new QList<Profile*>}, currentProfile{new Profile},
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
@@ -19,34 +18,35 @@ Settings::Settings(
     connect(ui->Add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
     connect(ui->newProfile, SIGNAL(clicked()), this, SLOT(onNewProfileClicked()));
     connect(ui->removeRole, SIGNAL(clicked()), this, SLOT(removeRole()));
+}
+void Settings::setCurrentProfile(){
+    if(profiles->size() == ui->profileBox->count())
+        return;
 
-    if(__currentProfile->profileName->isEmpty() || !__currentProfile)
+    if(currentProfile->profileName->isEmpty() || !currentProfile)
         ui->removeWidget->setVisible(false);
     else{
-        for(const auto& c : *__currentProfile->champs)
+        for(const auto& c : *currentProfile->champs)
             genChampButton(c, ui->champList);
-        for(const auto& c : *__currentProfile->banChamps)
+        for(const auto& c : *currentProfile->banChamps)
             genChampButton(c, ui->banChampList);
-        for(const auto& p: *__profiles)
+        for(const auto& p: *profiles)
             ui->profileBox->insertItem(0, *p->profileName);
-        ui->profileBox->setCurrentText(*__currentProfile->profileName);
-        ui->profileLabel->setText(*__currentProfile->profileName);
+        ui->profileBox->setCurrentText(*currentProfile->profileName);
+        ui->profileLabel->setText(*currentProfile->profileName);
     }
 }
 
 void Settings::removeRole(){
-    if(currentProfile->profileName->isEmpty())
-        return;
-
-    auto i = profiles.indexOf(currentProfile);
+    auto i = profiles->indexOf(currentProfile);
     ui->profileBox->removeItem(ui->profileBox->currentIndex());
-    profiles.remove(i);
+    profiles->remove(i);
     clearLayouts();
 
     if(i > 0)
-        currentProfile = profiles.at(i - 1);
-    else if(profiles.size() > 0)
-        currentProfile = profiles.at(i + 1);
+        currentProfile = profiles->at(i - 1);
+    else if(profiles->size() > 0)
+        currentProfile = profiles->at(i + 1);
     else{
         delete currentProfile;
         currentProfile = new Profile{};
@@ -69,7 +69,7 @@ void Settings::selected(){
     ui->removeWidget->setVisible(true);
     ui->profileLabel->setText(selected);
 
-    for(auto p : profiles)
+    for(auto p : *profiles)
         if(selected == *p->profileName)
             currentProfile = p;
 
@@ -158,7 +158,7 @@ void Settings::onNewProfileClicked(){
     if(ui->profileName->text() == "")
         return;
 
-    for(auto& p : profiles)
+    for(auto& p : *profiles)
         if(ui->profileName->text() == *p->profileName){
             return;
         }
@@ -172,5 +172,5 @@ void Settings::onNewProfileClicked(){
     ui->profileLabel->setText(ui->profileName->text());
     ui->profileBox->setCurrentText(ui->profileName->text());
     ui->profileName->setText("");
-    profiles.append(currentProfile);
+    profiles->append(currentProfile);
 }

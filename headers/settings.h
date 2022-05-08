@@ -22,14 +22,14 @@ private slots:
     void onNewProfileClicked();
     void removeRole();
 public:
-   QList<Profile*>& profiles;
+   QList<Profile*>* profiles;
    Profile* currentProfile;
 
-    explicit Settings(QWidget *parent = nullptr,
-        QList<Profile*>* = nullptr,  Profile* = nullptr);
+    explicit Settings(QWidget *parent = nullptr);
     ~Settings();
     void genChampButton(QString champ, QVBoxLayout* layout);
     void clearLayouts();
+    void setCurrentProfile();
 private:
     Ui::Settings *ui;
 };

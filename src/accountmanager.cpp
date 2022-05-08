@@ -3,6 +3,7 @@
 AccountManager::AccountManager(QWidget *parent):
     QMainWindow(parent), ui(new Ui::AccountManager)
 {
+
     ui->setupUi(this);
     setFixedSize(width(), height());
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));
@@ -12,10 +13,11 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Temp"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
 
-    loadSettings();
-    scripts = new Script{currentProfile};
+    settings = new Settings{this};
+    scripts = new Script{*settings->currentProfile};
     hotkeyA = new Hotkey();
     hotkeyR = new Hotkey();
+
 
     hotkeyA->registerHotkey(QKeySequence { "Ctrl+Shift+A" });
     hotkeyR->registerHotkey(QKeySequence { "Ctrl+Shift+R" });
@@ -23,6 +25,7 @@ AccountManager::AccountManager(QWidget *parent):
     connect(hotkeyA, SIGNAL(activated()), this, SLOT(on_actionEnableAccept_triggered()));
     connect(hotkeyR, SIGNAL(activated()), this, SLOT(on_actionEnableReport_triggered()));
 
+    loadSettings();
     loadAccounts();
     updateDetails();
 }
@@ -69,11 +72,11 @@ void AccountManager::saveSettings(){
     QJsonObject json;
     QJsonObject currentProfileObject;
 
-    currentProfile.write(currentProfileObject);
+    settings->currentProfile->write(currentProfileObject);
     json["currentProfile"] = currentProfileObject;
 
     QJsonArray profilesArray;
-    foreach(Profile* p, profiles){
+    foreach(Profile* p, *settings->profiles){
         QJsonObject profileObject;
         p->write(profileObject);
         profilesArray.append(profileObject);
@@ -102,14 +105,14 @@ void AccountManager::loadSettings(){
     QJsonObject json = loadDoc.object();
 
     QJsonObject currentProfileObject = json["currentProfile"].toObject();
-    currentProfile.read(currentProfileObject);
+    settings->currentProfile->read(currentProfileObject);
 
     QJsonArray profilesArray = json["profiles"].toArray();
     for(int i = 0; i < profilesArray.size(); i++){
         QJsonObject profileObject = profilesArray[i].toObject();
         auto p = new Profile{};
         p->read(profileObject);
-        profiles.append(p);
+        settings->profiles->append(p);
     }
 
     loadFile.close();
@@ -452,11 +455,11 @@ void AccountManager::on_actionEnableInsert_triggered(){
 }
 
 void AccountManager::on_actionSettings_4_triggered(){
-    Settings settings{this, &profiles, &currentProfile};
-    settings.setModal(true);
-    if(settings.exec() == QDialog::DialogCode::Rejected)
+    settings->setCurrentProfile();
+    settings->setModal(true);
+    if(settings->exec() == QDialog::DialogCode::Rejected)
         return;
-    currentProfile = *settings.currentProfile;
+    //currentProfile = *settings.currentProfile;
     //  if ok/apply
 //    champs = settings.champList;
 //    banChamps = settings.banChampList;
