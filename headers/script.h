@@ -23,7 +23,7 @@ class Script{
     private:
         QHash<int, bool> keys;
         QThread* keyThread;
-
+        const static unsigned int maxDepth = 3;
         void monitorKeys();
     public:
         enum type{
@@ -53,7 +53,7 @@ class Script{
         void select();
         void typeKeys(QString selectedChamp);
         void trigger(type __type);
-        QString getTextFromFrame(cv::Point p, cv::Mat);
+        QString getTextFromFrame(cv::Point p, cv::Mat, int depth=0);
 };
 
 #endif // SCRIPT_H

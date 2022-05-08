@@ -221,6 +221,7 @@ void Script::report(){
 //            cv::cvtColor(currentFrame, grayFrame, cv::COLOR_BGR2GRAY);
 //            cv::threshold(grayFrame, grayFrame, 50, 255, cv::THRESH_BINARY);
 //            cv::bitwise_not(grayFrame, grayFrame);
+
             cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
             rel += cv::Point{105, 118};
             for(int i = 0; i < 11; i++){
@@ -382,31 +383,43 @@ cv::Point Script::processFrame(QString object){
     return maxVal >= threshold ? matchLoc : cv::Point{-1, -1};
 }
 
-QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame){
+QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
+    int multiplier = 2 + depth;
+    qDebug() << depth;
     if(currentFrame.empty())
         return "";
     cv::Size size{135, 20};
-    cv::Mat croppedImage = currentFrame(cv::Rect{p.x, p.y, size.width, size.height});// +105x, +120y
+    cv::Mat croppedImage = currentFrame(
+        cv::Rect{p.x, p.y, size.width, size.height}
+    );// +105x, +120y
     cv::resize(croppedImage, croppedImage,
-        cv::Size(size.width*2, size.height*2), cv::INTER_LINEAR
+        cv::Size(size.width*multiplier, size.height*multiplier), cv::INTER_LINEAR
     );
+    croppedImage.convertTo(croppedImage, -1, 2, 0);
 
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 
     //  Include training data
     api->Init("./", "eng", tesseract::OEM_LSTM_ONLY);
     api->SetPageSegMode(tesseract::PSM_AUTO);
-    api->SetImage(croppedImage.data, croppedImage.cols, croppedImage.rows, 4, croppedImage.step);
-    api->SetSourceResolution(92);
+    api->SetImage(croppedImage.data, croppedImage.cols,
+        croppedImage.rows, 4, croppedImage.step
+    );
+    api->SetSourceResolution(300);
+
+
+    if (api->MeanTextConf() < 50 && depth < maxDepth){
+        return getTextFromFrame(p, currentFrame, depth + 1);
+    }
     auto text = QString{api->GetUTF8Text()};
 
     api->End();
     delete api;
 
-    cv::namedWindow("test");
-    cv::moveWindow("test", 100, 100);
-    cv::imshow("test", croppedImage);
-    cv::waitKey();
+//    cv::namedWindow("test");
+//    cv::moveWindow("test", 100, 100);
+//    cv::imshow("test", croppedImage);
+//    cv::waitKey();
 
     return text;
 }
