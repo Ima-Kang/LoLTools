@@ -416,6 +416,8 @@ QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
 
     if (api->MeanTextConf() < 50 && depth < maxDepth){
         return getTextFromFrame(p, currentFrame, depth + 1);
+    }else if(api->MeanTextConf() < 50){ // don't report if can't determine
+        return !whitelist.isEmpty() ? whitelist.first() : "";
     }
     auto text = QString{api->GetUTF8Text()};
 
