@@ -2,8 +2,8 @@
 #include "ui_settings.h"
 
 Settings::Settings(QWidget *parent) :
-    profiles{new QList<Profile*>}, currentProfile{new Profile},
-    ui(new Ui::Settings)
+    profiles{new QList<Profile*>}, whitelist{new QList<QString>},
+    currentProfile{new Profile}, ui(new Ui::Settings)
 {
     ui->setupUi(this);
     setFixedSize(width(), height());

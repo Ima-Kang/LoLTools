@@ -23,6 +23,8 @@ private slots:
     void removeRole();
 public:
    QList<Profile*>* profiles;
+   QList<QString>* whitelist;
+
    Profile* currentProfile;
 
     explicit Settings(QWidget *parent = nullptr);

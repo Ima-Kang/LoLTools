@@ -7,7 +7,8 @@
 #include "opencv2/imgproc.hpp"
 #include "tesseract/baseapi.h"
 #include "leptonica/allheaders.h"
-#include <opencv2/photo.hpp>
+#include "opencv2/photo.hpp"
+#include "settings.h"
 
 #include <Windows.h>
 #include <QString>
@@ -19,6 +20,7 @@
 #include <QHash>
 #include <functional>
 #include <QMutex>
+
 class Script{
     private:
         QHash<int, bool> keys;
@@ -31,13 +33,12 @@ class Script{
             Report,
             Select
         };
-        Profile& profile;
+        Settings* settings;
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
-        QList<QString> whitelist;
 
-        Script(Profile& __profile);
+        Script(Settings* __settings);
         cv::Point processFrame(QString object);
         cv::Mat QImageToMat(QImage image);
         cv::Mat captureScreenMat(HWND hwnd);

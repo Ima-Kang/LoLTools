@@ -14,7 +14,7 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
 
     settings = new Settings{this};
-    scripts = new Script{*settings->currentProfile};
+    scripts = new Script{settings};
     hotkeyA = new Hotkey();
     hotkeyR = new Hotkey();
 

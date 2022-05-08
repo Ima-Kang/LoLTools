@@ -1,7 +1,7 @@
 #include "../headers/script.h"
 
 void monitorKeys(Script* s);
-Script::Script(Profile& __profile): profile{__profile}{
+Script::Script(Settings* __settings): settings{__settings}{
     enabled = bool{false};
 
     genThread(type::Accept);
@@ -9,10 +9,6 @@ Script::Script(Profile& __profile): profile{__profile}{
 
     keyThread = QThread::create([this](){monitorKeys();});
     keyThread -> start();
-
-    //processFrame(":/imgs/accept.png");
-//    auto f = captureScreenMat(HWND{GetDesktopWindow()});
-//    getTextFromFrame(cv::Point{}, f);
 }
 
 void Script::genThread(type __type){
@@ -84,6 +80,7 @@ void Script::typeKeys(QString selectedChamp){
 
 void Script::select(){
     cv::Point p, q;
+    Profile profile = *settings->currentProfile;
     bool banned = false, first = true;
     auto key = new INPUT{};
     int prioChamp = 0, prioBanChamp = 0;
@@ -207,6 +204,7 @@ void Script::reportPlayer(cv::Point p){
 void Script::report(){
     cv::Point p, rel;
     auto key = new INPUT{};
+    auto whitelist = *settings->whitelist;
 
     keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['R'] = false;
     key -> type = INPUT_MOUSE;
@@ -357,7 +355,7 @@ cv::Mat Script::captureScreenMat(HWND hwnd){
 }
 
 cv::Point Script::processFrame(QString object){
-    cv::Mat currentFrame, templ, result, img_display;  //  gonna need to move frame
+    cv::Mat currentFrame, templ, result, img_display;
     QImage f2(object);
 
     currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
@@ -413,10 +411,10 @@ QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
     );
     api->SetSourceResolution(300);
 
-
     if (api->MeanTextConf() < 50 && depth < maxDepth){
         return getTextFromFrame(p, currentFrame, depth + 1);
     }else if(api->MeanTextConf() < 50){ // don't report if can't determine
+        auto whitelist = *settings->whitelist;
         return !whitelist.isEmpty() ? whitelist.first() : "";
     }
     auto text = QString{api->GetUTF8Text()};
