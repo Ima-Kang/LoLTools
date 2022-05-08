@@ -51,6 +51,7 @@ class Script{
         void select();
         void typeKeys(QString selectedChamp);
         void trigger(type __type);
+        QString getTextFromFrame(cv::Point p);
 };
 
 #endif // SCRIPT_H

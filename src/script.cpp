@@ -219,7 +219,20 @@ void Script::report(){
     while(!keys['R'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
         rel = p = processFrame(":/imgs/pgl.png");
         if(p != cv::Point{-1,-1} && !pgl){
-            rel += cv::Point{165, 156}; // +35
+            // get player names
+            rel += cv::Point{105, 120};
+            for(int i = 0; i < 10; i++){
+                //  process player name
+                QString name = getTextFromFrame(rel);
+                if(i == 4){
+                    rel += cv::Point{0, 8};
+                    continue;
+                }
+                rel += cv::Point{0, 35};
+            }
+
+            //  set rel loc for report buttons
+            rel = p + cv::Point{165, 156}; // first report loc
             for(int i = 0; i < 10; i++){
                 SetCursorPos(
                     rel.x,
@@ -364,4 +377,11 @@ cv::Point Script::processFrame(QString object){
     matchLoc = maxLoc;
 
     return maxVal >= threshold ? matchLoc : cv::Point{-1, -1};
+}
+
+QString Script::getTextFromFrame(cv::Point p){
+    cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
+
+    cv::Mat croppedImage = currentFrame(cv::Rect{p.x, p.y, 135, 20});// +105x, +120y
+
 }
