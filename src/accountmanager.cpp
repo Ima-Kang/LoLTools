@@ -3,7 +3,6 @@
 AccountManager::AccountManager(QWidget *parent):
     QMainWindow(parent), ui(new Ui::AccountManager)
 {
-
     ui->setupUi(this);
     setFixedSize(width(), height());
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(populateLayout()));

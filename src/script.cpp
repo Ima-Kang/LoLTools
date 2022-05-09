@@ -6,9 +6,6 @@ Script::Script(Settings* __settings): settings{__settings}{
 
     genThread(type::Accept);
     genThread(type::Report);
-
-    keyThread = QThread::create([this](){monitorKeys();});
-    keyThread -> start();
 }
 
 void Script::genThread(type __type){
@@ -20,16 +17,6 @@ void Script::genThread(type __type){
         case type::Select:
             script[type::Select] = QThread::create([this](){select();});
         break;
-    }
-}
-
-void Script::monitorKeys(){
-    while(true){
-        keys['A'] = GetAsyncKeyState('A');
-        keys['R'] = GetAsyncKeyState('R');
-        keys['S'] = GetAsyncKeyState('S');
-        keys[VK_LCONTROL] = GetAsyncKeyState(VK_LCONTROL);
-        keys[VK_LSHIFT] = GetAsyncKeyState(VK_LSHIFT);
     }
 }
 
@@ -85,10 +72,9 @@ void Script::select(){
     auto key = new INPUT{};
     int prioChamp = 0, prioBanChamp = 0;
 
-    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['S'] = false;
     key -> type = INPUT_MOUSE;
 
-    while(!keys['S'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
+    while(true){
         //  banning
         if(!banned){
             p = processFrame(":/imgs/search.png");
@@ -161,10 +147,9 @@ void Script::accept(){
     cv::Point p;
     auto key = new INPUT{};
 
-    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['A'] = false;
     key -> type = INPUT_MOUSE;
 
-    while(!keys['A'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
+    while(true){
         p = processFrame(":/imgs/accept.png");
         if(p != cv::Point{-1, -1}){
             p += cv::Point{100, 30};
@@ -206,11 +191,10 @@ void Script::report(){
     auto key = new INPUT{};
     auto whitelist = *settings->whitelist;
 
-    keys[VK_LCONTROL] = keys[VK_LSHIFT] = keys['R'] = false;
     key -> type = INPUT_MOUSE;
 
     bool pgl = false;
-    while(!keys['R'] || !keys[VK_LCONTROL] || !keys[VK_LSHIFT]){
+    while(true){
         rel = p = processFrame(":/imgs/pgl.png");
         if(p != cv::Point{-1,-1} && !pgl){
             // get player names

@@ -23,10 +23,7 @@
 
 class Script{
     private:
-        QHash<int, bool> keys;
-        QThread* keyThread;
         const static unsigned int maxDepth = 3;
-        void monitorKeys();
     public:
         enum type{
             Accept,
