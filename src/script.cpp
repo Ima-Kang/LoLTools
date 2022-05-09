@@ -201,6 +201,7 @@ void Script::report(){
             QMutex mu;
             cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
             QHash<QString, int> names;
+            QVector<QThread* > tThreads;
 
             rel += cv::Point{105, 153};
             //  process every player name
@@ -209,20 +210,19 @@ void Script::report(){
                     rel += cv::Point{0, 43};
                     continue;
                 }
-                QThread::create([this, &names, &mu]
+                tThreads.push_back(QThread::create([this, &names, &mu]
                     (cv::Point q, cv::Mat frame, int i){
                     QString name{getTextFromFrame(q, frame)}; name.chop(1);
                     mu.tryLock(); names[name] = i; mu.unlock();
-                }, rel, currentFrame, i) -> start();
+                }, rel, currentFrame, i));
+                tThreads.back() -> start();
 
                 rel += cv::Point{0, 35};
             }
 
-            auto temp = names;
-            while(names.size() < 9){
-                temp = names;
+            for(auto& t : tThreads){
+                while(!t->isFinished());
             }
-            names = temp;
 
             for(auto& name : whitelist){
                 if(names.contains(name))
