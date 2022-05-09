@@ -233,8 +233,11 @@ void Script::report(){
 
                 rel += cv::Point{0, 35};
             }
-            while(names.size() < 9);   //  wait until names are all determined
-
+            auto temp = names;
+            while(names.size() < 9){
+                temp = names;
+            }
+            names = temp;
             for(auto& name : whitelist){
                 if(names.contains(name))
                     names.remove(name);
@@ -243,6 +246,7 @@ void Script::report(){
             //  set rel loc for report buttons
             rel = p + cv::Point{165, 156}; // first report loc
             for(auto i : names.values()){
+                qDebug() << i;
                 SetCursorPos(
                     rel.x,
                     rel.y + i*35 + (i > 3 ? 8 : 0)
