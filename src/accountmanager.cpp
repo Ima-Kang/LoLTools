@@ -18,7 +18,6 @@ AccountManager::AccountManager(QWidget *parent):
     hotkeyA = new Hotkey();
     hotkeyR = new Hotkey();
 
-
     hotkeyA->registerHotkey(QKeySequence { "Ctrl+Shift+A" });
     hotkeyR->registerHotkey(QKeySequence { "Ctrl+Shift+R" });
 
@@ -28,6 +27,8 @@ AccountManager::AccountManager(QWidget *parent):
     loadSettings();
     loadAccounts();
     updateDetails();
+
+    settings->setAll();
 }
 
 AccountManager::~AccountManager(){  delete ui;}
@@ -455,13 +456,17 @@ void AccountManager::on_actionEnableInsert_triggered(){
 }
 
 void AccountManager::on_actionSettings_4_triggered(){
-    settings->setCurrentProfile();
+    settings->setView(0);
     settings->setModal(true);
     if(settings->exec() == QDialog::DialogCode::Rejected)
         return;
-    //currentProfile = *settings.currentProfile;
-    //  if ok/apply
-//    champs = settings.champList;
-//    banChamps = settings.banChampList;
+}
+
+
+void AccountManager::on_actionSettings_triggered(){
+    settings->setView(1);
+    settings->setModal(true);
+    if(settings->exec() == QDialog::DialogCode::Rejected)
+        return;
 }
 

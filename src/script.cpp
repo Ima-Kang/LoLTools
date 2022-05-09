@@ -233,11 +233,13 @@ void Script::report(){
 
                 rel += cv::Point{0, 35};
             }
+
             auto temp = names;
             while(names.size() < 9){
                 temp = names;
             }
             names = temp;
+
             for(auto& name : whitelist){
                 if(names.contains(name))
                     names.remove(name);

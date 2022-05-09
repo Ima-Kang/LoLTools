@@ -21,17 +21,23 @@ private slots:
     void selected();
     void onNewProfileClicked();
     void removeRole();
+    void selectedView();
+    void addPlayer();
 public:
    QList<Profile*>* profiles;
    QList<QString>* whitelist;
+   QPushButton* currentSelection;
 
    Profile* currentProfile;
 
     explicit Settings(QWidget *parent = nullptr);
     ~Settings();
-    void genChampButton(QString champ, QVBoxLayout* layout);
+    void genButton(QString champ, QVBoxLayout* layout);
     void clearLayouts();
     void setCurrentProfile();
+    void setView(int i);
+    void setAll();
+    void setWhitelist();
 private:
     Ui::Settings *ui;
 };

@@ -50,6 +50,8 @@ private slots:
 
     void on_actionSettings_4_triggered();
 
+    void on_actionSettings_triggered();
+
 private:
     Ui::AccountManager *ui;
     QVector<AccountInfo> accounts;

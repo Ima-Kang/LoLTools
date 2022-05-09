@@ -3,9 +3,10 @@
 
 Settings::Settings(QWidget *parent) :
     profiles{new QList<Profile*>}, whitelist{new QList<QString>},
-    currentProfile{new Profile}, ui(new Ui::Settings)
+    currentSelection{nullptr}, currentProfile{new Profile},
+    ui(new Ui::Settings)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);        
     setFixedSize(width(), height());
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -18,7 +19,82 @@ Settings::Settings(QWidget *parent) :
     connect(ui->Add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
     connect(ui->newProfile, SIGNAL(clicked()), this, SLOT(onNewProfileClicked()));
     connect(ui->removeRole, SIGNAL(clicked()), this, SLOT(removeRole()));
+
+    connect(ui->selectButton, SIGNAL(clicked()), this, SLOT(selectedView()));
+    connect(ui->reportButton, SIGNAL(clicked()), this, SLOT(selectedView()));
+    connect(ui->whiteListAdd, SIGNAL(clicked()), this, SLOT(addPlayer()));
 }
+
+void Settings::addPlayer(){
+    QString name = ui->nameWhitelist->text();
+
+    if(whitelist->indexOf(name) >= 0)
+        return;
+    else if(name == "")
+        return;
+
+    whitelist->append(name);
+    genButton(name, ui->whitelist);
+    ui->nameWhitelist->setText("");
+}
+
+void Settings::setView(int i){
+    QString style{".QPushButton{background-color: rgba(255, 255, 255, 20%);"};
+    style += "border-radius: 3px;";
+    style += " border: 1px solid #2ee6e6;}";
+
+    if(currentSelection)
+        currentSelection->setStyleSheet("");
+    else
+        currentSelection = ui->selectButton;
+
+    switch(i){
+        case 0:
+            setCurrentProfile();
+            selected();
+            currentSelection = ui->selectButton;
+            break;
+        case 1:
+            currentSelection = ui->reportButton;
+            break;
+        default:
+            break;
+    }
+
+    currentSelection->setStyleSheet(style);
+    ui->stackedWidget->setCurrentIndex(i);
+}
+
+void Settings::selectedView(){
+    auto buttonView = qobject_cast<QPushButton*>(sender());
+    QString style{".QPushButton{background-color: rgba(255, 255, 255, 20%);"};
+    style += "border-radius: 3px;";
+    style += " border: 1px solid #2ee6e6;}";
+
+    if(currentSelection)
+        currentSelection->setStyleSheet("");
+
+    currentSelection = buttonView;
+    currentSelection -> setStyleSheet(style);
+
+    if(currentSelection->objectName() == "selectButton")
+        ui->stackedWidget->setCurrentIndex(0);
+    else if(currentSelection->objectName() == "reportButton")
+        ui->stackedWidget->setCurrentIndex(1);
+}
+
+void Settings::setAll(){
+    setWhitelist();
+    setCurrentProfile();
+}
+
+void Settings::setWhitelist(){
+    if(whitelist->size())
+        return;
+    for(const auto& p : *whitelist)
+        genButton(p, ui->whitelist);
+}
+
 void Settings::setCurrentProfile(){
     if(profiles->size() == ui->profileBox->count())
         return;
@@ -26,10 +102,9 @@ void Settings::setCurrentProfile(){
     if(currentProfile->profileName->isEmpty() || !currentProfile)
         ui->removeWidget->setVisible(false);
     else{
-        for(const auto& c : *currentProfile->champs)
-            genChampButton(c, ui->champList);
+
         for(const auto& c : *currentProfile->banChamps)
-            genChampButton(c, ui->banChampList);
+            genButton(c, ui->banChampList);
         for(const auto& p: *profiles)
             ui->profileBox->insertItem(0, *p->profileName);
         ui->profileBox->setCurrentText(*currentProfile->profileName);
@@ -58,9 +133,9 @@ void Settings::removeRole(){
     ui->profileBox->setCurrentText(*currentProfile->profileName);
 
     for(auto& champ : *currentProfile->champs)
-        genChampButton(champ, ui->champList);
+        genButton(champ, ui->champList);
     for(auto& champ : *currentProfile->banChamps)
-        genChampButton(champ, ui->banChampList);
+        genButton(champ, ui->banChampList);
 }
 
 void Settings::selected(){
@@ -76,9 +151,9 @@ void Settings::selected(){
     clearLayouts();
 
     for(auto& champ : *currentProfile->champs)
-        genChampButton(champ, ui->champList);
+        genButton(champ, ui->champList);
     for(auto& champ : *currentProfile->banChamps)
-        genChampButton(champ, ui->banChampList);
+        genButton(champ, ui->banChampList);
 }
 
 void Settings::clearLayouts(){
@@ -105,7 +180,7 @@ void Settings::apply(){
 
 }
 
-void Settings::genChampButton(QString champName, QVBoxLayout* layout){
+void Settings::genButton(QString champName, QVBoxLayout* layout){
     QPushButton* nameButton = new QPushButton(champName);
     QObject::connect(
         nameButton, &QPushButton::clicked,
@@ -120,10 +195,18 @@ void Settings::onRemove(){
     QPushButton* button = qobject_cast<QPushButton*>(sender());
     QString name = button->text();
 
-    if(currentProfile->champs->indexOf(name) >= 0)
-        currentProfile->champs->remove(currentProfile->champs->indexOf(name));
-    else
-        currentProfile->banChamps->remove(currentProfile->banChamps->indexOf(name));
+    if(!currentSelection)
+        return;
+
+    if(currentSelection->objectName() == "reportButton"){
+        whitelist->remove(whitelist->indexOf(name));
+    } else{
+        if(currentProfile->champs->indexOf(name) >= 0)
+            currentProfile->champs->remove(currentProfile->champs->indexOf(name));
+        else
+            currentProfile->banChamps->remove(currentProfile->banChamps->indexOf(name));
+    }
+
     delete button;
 }
 
@@ -137,20 +220,13 @@ void Settings::onAddClicked(){
     else if(champName == "")
         return;
 
-    QVBoxLayout* champLayoutList = add ? ui->champList : ui->banChampList;
-    QPushButton* nameButton = new QPushButton(champName);
-    QObject::connect(
-        nameButton, &QPushButton::clicked,
-        this, &Settings::onRemove
-    );
-    //nameButton->setMaximumSize(QSize{250, 25});
     if(add)
         currentProfile->champs->append(champName);
     else
         currentProfile->banChamps->append(champName);
-    nameButton->setToolTip(QString{"Click to remove"});
 
-    champLayoutList->insertWidget(champLayoutList->count() - 1, nameButton);
+    QVBoxLayout* champLayoutList = add ? ui->champList : ui->banChampList;
+    genButton(champName, champLayoutList);
     ui->name->setText("");
 }
 
