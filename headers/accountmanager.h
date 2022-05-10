@@ -45,7 +45,7 @@ private slots:
     void on_actionEdit_account_triggered();
     void on_actionEnableAccept_triggered();
     void on_actionEnableReport_triggered();
-    void on_actionEnableInsert_triggered();
+    void on_actionEnableSelect_triggered();
     void on_actionSettings_4_triggered();
     void on_actionSettings_triggered();
 
@@ -56,6 +56,7 @@ private:
     //  Global hotkeys
     Hotkey* hotkeyA;
     Hotkey* hotkeyR;
+    Hotkey* hotkeyS;
     QHash<int, bool> keysPressed;
     QHash<QString, QFrame*> mUserToLayoutMap;
     QHash<QString, QList<QFrame*>> accLayouts;

@@ -16,12 +16,15 @@ AccountManager::AccountManager(QWidget *parent):
     scripts = new Script{settings};
     hotkeyA = new Hotkey();
     hotkeyR = new Hotkey();
+    hotkeyS = new Hotkey();
 
     hotkeyA->registerHotkey(QKeySequence { "Ctrl+Shift+A" });
     hotkeyR->registerHotkey(QKeySequence { "Ctrl+Shift+R" });
+    hotkeyS->registerHotkey(QKeySequence { "Ctrl+Shift+S" });
 
     connect(hotkeyA, SIGNAL(activated()), this, SLOT(on_actionEnableAccept_triggered()));
     connect(hotkeyR, SIGNAL(activated()), this, SLOT(on_actionEnableReport_triggered()));
+    connect(hotkeyS, SIGNAL(activated()), this, SLOT(on_actionEnableSelect_triggered()));
 
     settings->loadSettings();
     loadAccounts();
@@ -395,14 +398,28 @@ void AccountManager::on_actionEdit_account_triggered(){
 }
 
 void AccountManager::on_actionEnableAccept_triggered(){
+    if(ui->actionEnableAccept->text() == "Enable")
+        ui->actionEnableAccept->setText("Disable");
+    else
+        ui->actionEnableAccept->setText("Enable");
     scripts -> trigger(Script::type::Accept);
 }
 
 void AccountManager::on_actionEnableReport_triggered(){
+    if(ui->actionEnableReport->text() == "Enable")
+        ui->actionEnableReport->setText("Disable");
+    else
+        ui->actionEnableReport->setText("Enable");
+
     scripts -> trigger(Script::type::Report);
 }
 
-void AccountManager::on_actionEnableInsert_triggered(){
+void AccountManager::on_actionEnableSelect_triggered(){
+    if(ui->actionEnableSelect->text() == "Enable")
+        ui->actionEnableSelect->setText("Disable");
+    else
+        ui->actionEnableSelect->setText("Enable");
+
     scripts -> trigger(Script::type::Select);
 }
 

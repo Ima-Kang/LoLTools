@@ -675,7 +675,7 @@
       <string>Auto Int</string>
      </property>
      <addaction name="separator"/>
-     <addaction name="actionEnable_2"/>
+     <addaction name="actionEnableInt"/>
      <addaction name="separator"/>
     </widget>
     <widget class="QMenu" name="menuAuto_Accept">
@@ -689,7 +689,7 @@
      <property name="title">
       <string>Auto Select</string>
      </property>
-     <addaction name="actionEnableInsert"/>
+     <addaction name="actionEnableSelect"/>
      <addaction name="separator"/>
      <addaction name="actionSettings_4"/>
      <addaction name="separator"/>
@@ -746,7 +746,7 @@
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionEnable_2">
+  <action name="actionEnableInt">
    <property name="text">
     <string>Enable</string>
    </property>
@@ -756,7 +756,7 @@
     <string>Settings</string>
    </property>
   </action>
-  <action name="actionEnableInsert">
+  <action name="actionEnableSelect">
    <property name="text">
     <string>Enable</string>
    </property>
