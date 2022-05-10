@@ -23,7 +23,7 @@ AccountManager::AccountManager(QWidget *parent):
     connect(hotkeyA, SIGNAL(activated()), this, SLOT(on_actionEnableAccept_triggered()));
     connect(hotkeyR, SIGNAL(activated()), this, SLOT(on_actionEnableReport_triggered()));
 
-    loadSettings();
+    settings->loadSettings();
     loadAccounts();
     updateDetails();
 
@@ -64,59 +64,11 @@ void AccountManager::closeEvent(QCloseEvent *bar){
     }
 
     file.close();
-    saveSettings();
+    settings->saveSettings();
     bar->accept();
 }
 
-void AccountManager::saveSettings(){
-    QJsonObject json;
-    QJsonObject currentProfileObject;
 
-    settings->currentProfile->write(currentProfileObject);
-    json["currentProfile"] = currentProfileObject;
-
-    QJsonArray profilesArray;
-    foreach(Profile* p, *settings->profiles){
-        QJsonObject profileObject;
-        p->write(profileObject);
-        profilesArray.append(profileObject);
-    }
-    json["profiles"] = profilesArray;
-
-    QFile saveFile(QStringLiteral("settings.json"));
-    if (!saveFile.open(QIODevice::WriteOnly)) {
-        qWarning("Couldn't save.");
-        return;
-    }
-    QJsonDocument saveDoc{json};
-    saveFile.write(saveDoc.toJson());
-    saveFile.close();
-}
-
-void AccountManager::loadSettings(){
-    QFile loadFile(QStringLiteral("settings.json"));
-    if (!loadFile.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't load.");
-        return;
-    }
-
-    QByteArray saveData = loadFile.readAll();
-    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
-    QJsonObject json = loadDoc.object();
-
-    QJsonObject currentProfileObject = json["currentProfile"].toObject();
-    settings->currentProfile->read(currentProfileObject);
-
-    QJsonArray profilesArray = json["profiles"].toArray();
-    for(int i = 0; i < profilesArray.size(); i++){
-        QJsonObject profileObject = profilesArray[i].toObject();
-        auto p = new Profile{};
-        p->read(profileObject);
-        settings->profiles->append(p);
-    }
-
-    loadFile.close();
-}
 
 void AccountManager::keyPressEvent(QKeyEvent* event){
     keysPressed[event->key()] = true;

@@ -25,6 +25,68 @@ Settings::Settings(QWidget *parent) :
     connect(ui->whiteListAdd, SIGNAL(clicked()), this, SLOT(addPlayer()));
 }
 
+void Settings::saveSettings(){
+    QJsonObject json;
+    QJsonObject currentProfileObject;
+
+    currentProfile->write(currentProfileObject);
+    json["currentProfile"] = currentProfileObject;
+
+    QJsonArray profilesArray;
+    foreach(Profile* p, *profiles){
+        QJsonObject profileObject;
+        p->write(profileObject);
+        profilesArray.append(profileObject);
+    }
+    json["profiles"] = profilesArray;
+
+    QJsonArray whitelistArray;
+    foreach(QString val, *whitelist){
+        whitelistArray.append(val);
+    }
+    json["whitelist"] = whitelistArray;
+
+    QFile saveFile(QStringLiteral("settings.json"));
+    if (!saveFile.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't save.");
+        return;
+    }
+
+    QJsonDocument saveDoc{json};
+    saveFile.write(saveDoc.toJson());
+    saveFile.close();
+}
+
+void Settings::loadSettings(){
+    QFile loadFile(QStringLiteral("settings.json"));
+    if (!loadFile.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't load.");
+        return;
+    }
+
+    QByteArray saveData = loadFile.readAll();
+    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+    QJsonObject json = loadDoc.object();
+
+    QJsonObject currentProfileObject = json["currentProfile"].toObject();
+    currentProfile->read(currentProfileObject);
+
+    QJsonArray profilesArray = json["profiles"].toArray();
+    for(int i = 0; i < profilesArray.size(); i++){
+        QJsonObject profileObject = profilesArray[i].toObject();
+        auto p = new Profile{};
+        p->read(profileObject);
+        profiles->append(p);
+    }
+
+    QJsonArray whitelistArray = json["whitelist"].toArray();
+    foreach(QJsonValueRef val, whitelistArray)
+        whitelist->append(val.toString());
+    json["whitelist"] = whitelistArray;
+
+    loadFile.close();
+}
+
 void Settings::addPlayer(){
     QString name = ui->nameWhitelist->text();
 
@@ -89,8 +151,9 @@ void Settings::setAll(){
 }
 
 void Settings::setWhitelist(){
-    if(whitelist->size())
+    if(whitelist->size() == ui->whitelist->count())
         return;
+
     for(const auto& p : *whitelist)
         genButton(p, ui->whitelist);
 }
@@ -102,7 +165,6 @@ void Settings::setCurrentProfile(){
     if(currentProfile->profileName->isEmpty() || !currentProfile)
         ui->removeWidget->setVisible(false);
     else{
-
         for(const auto& c : *currentProfile->banChamps)
             genButton(c, ui->banChampList);
         for(const auto& p: *profiles)
@@ -114,6 +176,7 @@ void Settings::setCurrentProfile(){
 
 void Settings::removeRole(){
     auto i = profiles->indexOf(currentProfile);
+
     ui->profileBox->removeItem(ui->profileBox->currentIndex());
     profiles->remove(i);
     clearLayouts();
@@ -121,7 +184,7 @@ void Settings::removeRole(){
     if(i > 0)
         currentProfile = profiles->at(i - 1);
     else if(profiles->size() > 0)
-        currentProfile = profiles->at(i + 1);
+        currentProfile = profiles->at(i);
     else{
         delete currentProfile;
         currentProfile = new Profile{};
@@ -139,6 +202,10 @@ void Settings::removeRole(){
 }
 
 void Settings::selected(){
+    if(currentProfile->profileName->isEmpty()){
+        ui->removeWidget->setVisible(false);
+        return;
+    }
     QString selected{ui->profileBox->currentText()};
 
     ui->removeWidget->setVisible(true);
@@ -187,7 +254,7 @@ void Settings::genButton(QString champName, QVBoxLayout* layout){
         this, &Settings::onRemove
     );
     nameButton->setToolTip(QString{"Click to remove"});
-
+    nameButton->setFont(QFont{"Arial", 12});
     layout->insertWidget(layout->count() - 1, nameButton);
 }
 

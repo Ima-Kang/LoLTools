@@ -6,6 +6,7 @@
 #include <QAbstractButton>
 #include <QLayout>
 #include "profile.h"
+#include <QFile>
 
 namespace Ui {
 class Settings;
@@ -38,6 +39,8 @@ public:
     void setView(int i);
     void setAll();
     void setWhitelist();
+    void loadSettings();
+    void saveSettings();
 private:
     Ui::Settings *ui;
 };

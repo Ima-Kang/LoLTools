@@ -45,11 +45,8 @@ private slots:
     void on_actionEdit_account_triggered();
     void on_actionEnableAccept_triggered();
     void on_actionEnableReport_triggered();
-
     void on_actionEnableInsert_triggered();
-
     void on_actionSettings_4_triggered();
-
     void on_actionSettings_triggered();
 
 private:
@@ -82,7 +79,5 @@ private:
     void onButtonCopy();
     void updateRowNumber();
     void onStatusChange();
-    void loadSettings();
-    void saveSettings();
 };
 #endif // ACCOUNTMANAGER_H
