@@ -1,6 +1,34 @@
 #include "../headers/script.h"
 
-void monitorKeys(Script* s);
+int editDist(QString str1, QString str2){
+    int n = str1.size(), m = str2.size();
+    int **dp = new int *[n + 1];
+
+    for (int i = 0; i <= n; i++)
+        dp[i] = new int[m + 1];
+
+    for (int i = 0; i <= n; i++){
+        for (int j = 0; j <= m; j++){
+            if (i == 0)
+                dp[i][j] = j;
+            else if (j == 0)
+                dp[i][j] = i;
+            else if (str1[i - 1] == str2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1];
+            else{
+                dp[i][j] = 1 + min(
+                    min(dp[i][j - 1],dp[i - 1][j]),
+                    dp[i - 1][j - 1]
+                );
+            }
+        }
+    }
+    int ans = dp[n][m];
+    for (int i = 0; i <= n; i++)
+        delete[] dp[i];
+    delete[] dp;
+    return ans;
+}
 Script::Script(Settings* __settings, QList<QAction*> __actions):
     settings{__settings}, actions{__actions}{
     enabled = bool{false};
@@ -177,7 +205,7 @@ void Script::accept(){
 }
 
 void Script::reportPlayer(cv::Point p){
-    cv::Point rel{438, 232};
+    cv::Point rel{448, 232};
     auto key = new INPUT{};
     key -> type = INPUT_MOUSE;
 
@@ -216,13 +244,14 @@ void Script::report(){
             QHash<QString, int> names;
             QVector<QThread* > tThreads;
 
-            rel += cv::Point{105, 153};
+            rel += cv::Point{165, 136};
             //  process every player name
-            for(int i = 0; i < 10; i++){
-                if(i == 4){
-                    rel += cv::Point{0, 43};
+            for(int i = 0; i < 11; i++){
+                if(i == 5){
+                    rel += cv::Point{0, 36};
                     continue;
                 }
+                getTextFromFrame(rel, currentFrame);
                 tThreads.push_back(QThread::create([this, &names, &mu]
                     (cv::Point q, cv::Mat frame, int i){
                     QString name{getTextFromFrame(q, frame)}; name.chop(1);
@@ -230,24 +259,36 @@ void Script::report(){
                 }, rel, currentFrame, i));
                 tThreads.back() -> start();
 
-                rel += cv::Point{0, 35};
+                rel += cv::Point{0, 41};
             }
 
             for(auto& t : tThreads){
                 while(!t->isFinished());
             }
+            auto guessNames = names.keys();
 
             for(auto& name : whitelist){
                 if(names.contains(name))
                     names.remove(name);
+                else{
+                    for(auto gname : guessNames){
+                        if(gname.isEmpty())
+                            continue;
+                        auto entropy{
+                            editDist(name, gname)
+                        };
+                        if(entropy < 5)
+                            names.remove(gname);
+                    }
+                }
             }
 
             //  set rel loc for report buttons
-            rel = p + cv::Point{165, 156}; // first report loc
+            rel = p + cv::Point{245, 156}; // first report loc
             for(auto i : names.values()){
                 SetCursorPos(
                     rel.x,
-                    rel.y + i*35 + (i > 3 ? 8 : 0)
+                    rel.y + i*41 - (i > 4 ? 3 : 0)
                 );
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 key -> mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -394,14 +435,15 @@ QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
     int multiplier = 2 + depth;
     if(currentFrame.empty())
         return "";
-    cv::Size size{135, 20};
+    cv::Size size{135, 16};
+
     cv::Mat croppedImage = currentFrame(
         cv::Rect{p.x, p.y, size.width, size.height}
     );// +105x, +120y
     cv::resize(croppedImage, croppedImage,
         cv::Size(size.width*multiplier, size.height*multiplier), cv::INTER_LINEAR
     );
-    croppedImage.convertTo(croppedImage, -1, 2, 0);
+    //croppedImage.convertTo(croppedImage, -1, 2, 0);
 
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
 
@@ -415,9 +457,6 @@ QString Script::getTextFromFrame(cv::Point p, cv::Mat currentFrame, int depth){
 
     if (api->MeanTextConf() < 50 && depth < maxDepth){
         return getTextFromFrame(p, currentFrame, depth + 1);
-    }else if(api->MeanTextConf() < 50){ // don't report if can't determine
-        auto whitelist = *settings->whitelist;
-        return !whitelist.isEmpty() ? whitelist.first() : "";
     }
     auto text = QString{api->GetUTF8Text()};
 
