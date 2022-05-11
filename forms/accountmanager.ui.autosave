@@ -649,7 +649,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Scripts </string>
+         <string>Scripts:</string>
         </property>
        </widget>
       </item>

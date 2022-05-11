@@ -1,7 +1,8 @@
 #include "../headers/script.h"
 
 void monitorKeys(Script* s);
-Script::Script(Settings* __settings): settings{__settings}{
+Script::Script(Settings* __settings, QList<QAction*> __actions):
+    settings{__settings}, actions{__actions}{
     enabled = bool{false};
 
     genThread(type::Accept);
@@ -85,6 +86,7 @@ void Script::select(){
             if(p != cv::Point{-1, -1} && !first){
                 p += cv::Point{100, 10};
                 click(key, p);
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 click(key, p);
 
                 if(prioBanChamp < profile.banChamps->size()){
@@ -140,6 +142,12 @@ void Script::select(){
             break;
     }
     enabledScripts[type::Select] = false;
+
+    for(auto& a: actions){
+        if(a->objectName() == "actionEnableSelect")
+            a->setText("Enable (Ctrl + Shift + S)");
+    }
+
     delete key;
 }
 
@@ -158,6 +166,12 @@ void Script::accept(){
         if(!enabledScripts[type::Accept])
             break;
     }
+
+    for(auto& a: actions){
+        if(a->objectName() == "actionEnableAccept")
+            a->setText("Enable (Ctrl + Shift + A)");
+    }
+
     enabledScripts[type::Accept] = false;
     delete key;
 }
@@ -193,10 +207,9 @@ void Script::report(){
 
     key -> type = INPUT_MOUSE;
 
-    bool pgl = false;
     while(true){
         rel = p = processFrame(":/imgs/pgl.png");
-        if(p != cv::Point{-1,-1} && !pgl){
+        if(p != cv::Point{-1,-1}){
             // get player names
             QMutex mu;
             cv::Mat currentFrame = captureScreenMat(HWND{GetDesktopWindow()});
@@ -232,7 +245,6 @@ void Script::report(){
             //  set rel loc for report buttons
             rel = p + cv::Point{165, 156}; // first report loc
             for(auto i : names.values()){
-                qDebug() << i;
                 SetCursorPos(
                     rel.x,
                     rel.y + i*35 + (i > 3 ? 8 : 0)
@@ -244,17 +256,17 @@ void Script::report(){
                 SendInput(1, key, sizeof(INPUT));
                 reportPlayer(p);
             }
-            pgl = true;
+            break;
         }
-        p = processFrame(":/imgs/find_match.png");
-        pgl &= p == cv::Point{-1,-1};
-        p = processFrame(":/imgs/in_queue.png");
-        pgl &= p == cv::Point{-1,-1};
-
         if(!enabledScripts[type::Report])
             break;
     }
     enabledScripts[type::Report] = false;
+
+    for(auto& a: actions){
+        if(a->objectName() == "actionEnableReport")
+            a->setText("Enable (Ctrl + Shift + R)");
+    }
     delete key;
 }
 

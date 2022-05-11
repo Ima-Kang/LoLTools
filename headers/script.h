@@ -20,7 +20,7 @@
 #include <QHash>
 #include <functional>
 #include <QMutex>
-
+#include <QAction>
 class Script{
     private:
         const static unsigned int maxDepth = 3;
@@ -31,11 +31,12 @@ class Script{
             Select
         };
         Settings* settings;
+        QList<QAction*> actions;
         bool enabled;
         QHash<int, QThread*> script;
         QHash<int, bool> enabledScripts;
 
-        Script(Settings* __settings);
+        Script(Settings* __settings, QList<QAction*> actions);
         cv::Point processFrame(QString object);
         cv::Mat QImageToMat(QImage image);
         cv::Mat captureScreenMat(HWND hwnd);

@@ -12,8 +12,13 @@ AccountManager::AccountManager(QWidget *parent):
     accLayouts.insert(QString{"Temp"}, QList<QFrame*>{});
     accLayouts.insert(QString{"Perma"}, QList<QFrame*>{});
 
+    QList<QAction*> actions;
+    actions.append(ui->actionEnableAccept);
+    actions.append(ui->actionEnableReport);
+    actions.append(ui->actionEnableSelect);
+
     settings = new Settings{this};
-    scripts = new Script{settings};
+    scripts = new Script{settings, actions};
     hotkeyA = new Hotkey();
     hotkeyR = new Hotkey();
     hotkeyS = new Hotkey();
@@ -160,7 +165,6 @@ void AccountManager::generateAccountLayout(AccountInfo& acc){
     newLayout -> setContentsMargins(4, 4, 4, 4);
 
     QLabel* number = new QLabel{tr("#%1").arg(accounts.count())};
-
     QFrame* frame = new QFrame();
 
     frame -> setLayoutDirection(Qt::LayoutDirection::LeftToRight);
@@ -398,27 +402,40 @@ void AccountManager::on_actionEdit_account_triggered(){
 }
 
 void AccountManager::on_actionEnableAccept_triggered(){
-    if(ui->actionEnableAccept->text() == "Enable")
-        ui->actionEnableAccept->setText("Disable");
-    else
-        ui->actionEnableAccept->setText("Enable");
+    if(ui->actionEnableAccept->text() == "Enable (Ctrl + Shift + A)"){
+        ui->acceptDetail->setText("Auto Accept: Enabled");
+        ui->actionEnableAccept->setText("Disable (Ctrl + Shift + A)");
+    }
+    else{
+        ui->acceptDetail->setText("Auto Accept: Disabled");
+        ui->actionEnableAccept->setText("Enable (Ctrl + Shift + A)");
+    }
+
     scripts -> trigger(Script::type::Accept);
 }
 
 void AccountManager::on_actionEnableReport_triggered(){
-    if(ui->actionEnableReport->text() == "Enable")
-        ui->actionEnableReport->setText("Disable");
-    else
-        ui->actionEnableReport->setText("Enable");
+    if(ui->actionEnableReport->text() == "Enable (Ctrl + Shift + R)"){
+        ui->reportDetail->setText("Auto Report: Enabled");
+        ui->actionEnableReport->setText("Disable (Ctrl + Shift + R)");
+    }
+    else{
+        ui->reportDetail->setText("Auto Report: Disabled");
+        ui->actionEnableReport->setText("Enable (Ctrl + Shift + R)");
+    }
 
     scripts -> trigger(Script::type::Report);
 }
 
 void AccountManager::on_actionEnableSelect_triggered(){
-    if(ui->actionEnableSelect->text() == "Enable")
-        ui->actionEnableSelect->setText("Disable");
-    else
-        ui->actionEnableSelect->setText("Enable");
+    if(ui->actionEnableSelect->text() == "Enable (Ctrl + Shift + S)"){
+        ui->selectDetail->setText("Auto Select: Enabled");
+        ui->actionEnableSelect->setText("Disable (Ctrl + Shift + S)");
+    }
+    else{
+        ui->selectDetail->setText("Auto Select: Disabled");
+        ui->actionEnableSelect->setText("Enable (Ctrl + Shift + S)");
+    }
 
     scripts -> trigger(Script::type::Select);
 }
